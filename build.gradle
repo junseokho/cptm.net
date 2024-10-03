@@ -40,6 +40,8 @@ dependencies {
     testImplementation 'com.h2database:h2'  // H2 Database 추가
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    runtimeOnly 'com.h2database:h2' // 개발/테스트용
 }
 
 tasks.named('test') {

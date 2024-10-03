@@ -1,12 +1,16 @@
 package com.example.chessdotnet.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,36 +25,5 @@ public class User {
     @ManyToMany(mappedBy = "players")
     private Set<Room> joinedRooms;
 
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public List<Room> getCreatedRooms() {
-        return createdRooms;
-    }
-
-    public void setCreatedRooms(List<Room> createdRooms) {
-        this.createdRooms = createdRooms;
-    }
-
-    public Set<Room> getJoinedRooms() {
-        return joinedRooms;
-    }
-
-    public void setJoinedRooms(Set<Room> joinedRooms) {
-        this.joinedRooms = joinedRooms;
-    }
+    // Lombok이 getter와 setter 메소드를 자동 생성하므로 기존의 메소드들은 제거합니다.
 }

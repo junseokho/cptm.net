@@ -48,6 +48,6 @@ class RoomRepositorySpringTest {
         List<Room> availableRooms = roomRepository.findByIsGameStartedFalse();
 
         assertThat(availableRooms).hasSize(1);
-        assertThat(availableRooms.get(0).getTitle()).isEqualTo("Available Room");
+        assertThat(availableRooms.getFirst().getTitle()).isEqualTo("Available Room");
     }
 }
