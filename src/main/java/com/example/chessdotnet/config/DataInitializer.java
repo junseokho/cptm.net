@@ -25,13 +25,14 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initData(UserRepository userRepository) {
         return args -> {
-            Long temp = userRepository.count();
-            Long temp2 = 0L;
+//            Long temp = userRepository.count();
+//            Long temp2 = 0L;
 
-            if (temp.equals(temp2)) {  // 데이터베이스에 사용자가 없을 때만 실행
+            if (userRepository.count() == 0L) {  // 데이터베이스에 사용자가 없을 때만 실행
                 User user = new User();
                 user.setUsername("testUser");
                 userRepository.save(user);
+                System.out.println("username: " + user.getUsername()+ "\n" + "userId: " + user.getId());
             }
         };
     }
