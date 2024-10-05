@@ -8,10 +8,20 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * 애플리케이션의 보안 설정을 담당하는 설정 클래스입니다.
+ */
 @Configuration // 스프링 설정 클래스임을 나타냄
 @EnableWebSecurity // 웹 보안 기능을 활성화
 public class SecurityConfig {
 
+    /**
+     * 보안 필터 체인을 구성합니다.
+     *
+     * @param http HttpSecurity 객체
+     * @return 구성된 SecurityFilterChain
+     * @throws Exception 보안 설정 중 발생할 수 있는 예외
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

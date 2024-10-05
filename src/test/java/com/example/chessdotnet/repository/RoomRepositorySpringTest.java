@@ -11,6 +11,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * RoomRepository의 JPA 테스트 클래스입니다.
+ */
 @DataJpaTest
 class RoomRepositorySpringTest {
 
@@ -20,6 +23,9 @@ class RoomRepositorySpringTest {
     @Autowired
     private RoomRepository roomRepository;
 
+    /**
+     * findByIsGameStartedFalse 메서드가 게임이 시작되지 않은 방만 반환하는지 테스트합니다.
+     */
     @Test
     void findByIsGameStartedFalse_ShouldReturnOnlyAvailableRooms() {
         // 먼저 User 엔티티를 생성하고 저장합니다.

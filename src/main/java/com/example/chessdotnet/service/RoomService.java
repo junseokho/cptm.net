@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+/**
+ * 체스 게임 방 관련 비즈니스 로직을 처리하는 서비스 클래스입니다.
+ */
 @Service // 비즈니스 로직을 담당하는 서비스 클래스임을 나타냄
 public class RoomService {
     @Autowired
@@ -17,7 +20,14 @@ public class RoomService {
     @Autowired
     private UserRepository userRepository;
 
-    // 새로운 방을 생성하는 메서드
+    /**
+     * 새로운 게임 방을 생성합니다.
+     *
+     * @param title     생성할 방의 제목
+     * @param creatorId 방을 생성하는 사용자의 ID
+     * @return 생성된 Room 객체
+     * @throws RuntimeException 사용자를 찾을 수 없는 경우
+     */
     public Room createRoom(String title, Long creatorId) {
         // 생성자 ID로 사용자를 찾음
         User creator = userRepository.findById(creatorId)
@@ -33,7 +43,14 @@ public class RoomService {
         return roomRepository.save(room);
     }
 
-    // 사용자가 방에 참여하는 메서드
+    /**
+     * 사용자가 특정 게임 방에 참여합니다.
+     *
+     * @param roomId 참여할 방의 ID
+     * @param userId 참여하는 사용자의 ID
+     * @return 업데이트된 Room 객체
+     * @throws RuntimeException 방을 찾을 수 없거나, 방이 가득 찼거나, 사용자를 찾을 수 없는 경우
+     */
     public Room joinRoom(Long roomId, Long userId) {
         // 방 ID로 방을 찾음
         Room room = roomRepository.findById(roomId)
@@ -61,7 +78,11 @@ public class RoomService {
         return roomRepository.save(room);
     }
 
-    // 사용 가능한 (게임이 시작되지 않은) 방들의 목록을 조회하는 메서드
+    /**
+     * 게임이 시작되지 않은 모든 방의 목록을 조회합니다.
+     *
+     * @return 사용 가능한 Room 객체들의 List
+     */
     public List<Room> getAvailableRooms() {
         return roomRepository.findByIsGameStartedFalse();
     }

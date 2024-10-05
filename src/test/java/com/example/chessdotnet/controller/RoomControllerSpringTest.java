@@ -27,6 +27,9 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * RoomController의 Spring MVC 테스트 클래스입니다.
+ */
 @WebMvcTest(RoomController.class)
 class RoomControllerSpringTest {
 
@@ -42,6 +45,9 @@ class RoomControllerSpringTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    /**
+     * 각 테스트 전에 실행되는 설정 메서드입니다.
+     */
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders
@@ -50,6 +56,9 @@ class RoomControllerSpringTest {
                 .build();
     }
 
+    /**
+     * 방 생성 요청이 성공적으로 처리되는지 테스트합니다.
+     */
     @Test
     void createRoom_ShouldReturnCreatedRoom() throws Exception {
         CreateRoomRequest request = new CreateRoomRequest();
@@ -72,6 +81,9 @@ class RoomControllerSpringTest {
                 .andExpect(jsonPath("$.title").value("Test Room"));
     }
 
+    /**
+     * 잘못된 방 참여 요청이 적절히 처리되는지 테스트합니다.
+     */
     @Test
     void joinRoom_WithInvalidRequest_ShouldReturnBadRequest() throws Exception {
         JoinRoomRequest request = new JoinRoomRequest();
@@ -85,6 +97,9 @@ class RoomControllerSpringTest {
                 .andExpect(status().isBadRequest());
     }
 
+    /**
+     * 사용 가능한 방 목록 조회가 정상적으로 동작하는지 테스트합니다.
+     */
     @Test
     void getAvailableRooms_ShouldReturnListOfRooms() throws Exception {
         Room room1 = new Room();
@@ -106,6 +121,9 @@ class RoomControllerSpringTest {
                 .andExpect(jsonPath("$[1].title").value("Room 2"));
     }
 
+    /**
+     * 존재하지 않는 방에 대한 요청이 적절히 처리되는지 테스트합니다.
+     */
     @Test
     void handleNotFoundExceptions_ShouldReturnNotFound() throws Exception {
         JoinRoomRequest request = new JoinRoomRequest();
