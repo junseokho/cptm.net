@@ -31,4 +31,9 @@ public class User {
     /** 사용자가 참여한 방 목록 */
     @ManyToMany(mappedBy = "players") // 다대다 관계, Room 엔티티의 players 필드에 매핑
     private Set<Room> joinedRooms; // 사용자가 참여한 방 목록
+
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
+
 }
