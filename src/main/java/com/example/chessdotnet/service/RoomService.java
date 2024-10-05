@@ -2,6 +2,7 @@ package com.example.chessdotnet.service;
 
 import com.example.chessdotnet.entity.Room;
 import com.example.chessdotnet.entity.User;
+import com.example.chessdotnet.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import com.example.chessdotnet.repository.RoomRepository;
 import com.example.chessdotnet.repository.UserRepository;
@@ -21,17 +22,17 @@ public class RoomService {
     private UserRepository userRepository;
 
     /**
-     * 새로운 게임 방을 생성합니다.
+     * 새로운 방을 생성합니다.
      *
-     * @param title     생성할 방의 제목
+     * @param title 생성할 방의 제목
      * @param creatorId 방을 생성하는 사용자의 ID
      * @return 생성된 Room 객체
-     * @throws RuntimeException 사용자를 찾을 수 없는 경우
+     * @throws UserNotFoundException 지정된 ID의 사용자를 찾을 수 없는 경우
      */
     public Room createRoom(String title, Long creatorId) {
         // 생성자 ID로 사용자를 찾음
         User creator = userRepository.findById(creatorId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + creatorId));
 
         // 새 Room 객체 생성 및 초기화
         Room room = new Room();

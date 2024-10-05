@@ -7,6 +7,7 @@ import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -102,5 +103,16 @@ public class RoomController {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
         return ResponseEntity.badRequest().body("Invalid input: " + ex.getBindingResult().getAllErrors().getFirst().getDefaultMessage());
+    }
+
+    /**
+     * UserNotFoundException이 발생했을 때 이를 처리하고 적절한 응답을 반환합니다.
+     *
+     * @param ex 발생한 UserNotFoundException
+     * @return 404 Not Found 상태와 오류 메시지를 포함한 ResponseEntity
+     */
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }
