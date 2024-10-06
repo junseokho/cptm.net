@@ -1,5 +1,6 @@
 package com.example.chessdotnet.entity;
 
+import com.example.chessdotnet.dto.RoomDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,4 +52,22 @@ public class Room {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> players = new HashSet<>(); // 방에 참여한 플레이어들
+
+    /**
+     * Room 엔티티를 RoomDTO로 변환합니다.
+     *
+     * @author 전종영
+     * @return 변환된 RoomDTO 객체
+     */
+    public RoomDTO toDTO() {
+        RoomDTO dto = new RoomDTO();
+        dto.setId(this.id);
+        dto.setTitle(this.title);
+        dto.setCreatorId(this.creator.getId());
+        dto.setCreatorUsername(this.creator.getUsername());
+        dto.setCurrentPlayers(this.currentPlayers);
+        dto.setMaxPlayers(this.maxPlayers);
+        dto.setGameStarted(this.isGameStarted);
+        return dto;
+    }
 }

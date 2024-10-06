@@ -1,5 +1,6 @@
 package com.example.chessdotnet.entity;
 
+import com.example.chessdotnet.dto.UserDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -27,11 +28,26 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username; // 사용자 이름, 고유해야 함
 
-//    /** 사용자가 생성한 방 목록 */
-//    @OneToMany(mappedBy = "creator") // 일대다 관계, Room 엔티티의 creator 필드에 매핑
-//    private List<Room> createdRooms; // 사용자가 생성한 방 목록
+    /** 사용자가 생성한 방 목록 */
+    @OneToMany(mappedBy = "creator") // 일대다 관계, Room 엔티티의 creator 필드에 매핑
+    private List<Room> createdRooms; // 사용자가 생성한 방 목록
 
-//    /** 사용자가 참여한 방 목록 */
-//    @ManyToMany(mappedBy = "players") // 다대다 관계, Room 엔티티의 players 필드에 매핑
-//    private Set<Room> joinedRooms; // 사용자가 참여한 방 목록
+    /** 사용자가 참여한 방 목록 */
+    @ManyToMany(mappedBy = "players") // 다대다 관계, Room 엔티티의 players 필드에 매핑
+    private Set<Room> joinedRooms; // 사용자가 참여한 방 목록
+
+    /**
+     * User 엔티티를 UserDTO로 변환합니다.
+     *
+     * @author 전종영
+     * @return 변환된 UserDTO 객체
+     */
+    public UserDTO toDTO() {
+        UserDTO dto = new UserDTO();
+        dto.setId(this.id);
+        dto.setUsername(this.username);
+        dto.setCreatedRoomsCount(this.createdRooms.size());
+        dto.setJoinedRoomsCount(this.joinedRooms.size());
+        return dto;
+    }
 }

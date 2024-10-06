@@ -2,6 +2,7 @@ package com.example.chessdotnet.controller;
 
 import com.example.chessdotnet.dto.CreateRoomRequest;
 import com.example.chessdotnet.dto.JoinRoomRequest;
+import com.example.chessdotnet.dto.RoomDTO;
 import com.example.chessdotnet.entity.Room;
 import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
@@ -38,10 +39,9 @@ public class RoomController {
      * @return 생성된 방 정보
      */
     @PostMapping("/create")
-    public ResponseEntity<Room> createRoom(@Valid @RequestBody CreateRoomRequest request) {
+    public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody CreateRoomRequest request) {
         log.info("방 생성 요청: {}", request.getTitle());
-        Room room = roomService.createRoom(request.getTitle(), request.getCreatorId());
-        log.info("방 생성 완료. 방 ID: {}", room.getId());
+        RoomDTO room = roomService.createRoom(request.getTitle(), request.getCreatorId());        log.info("방 생성 완료. 방 ID: {}", room.getId());
         return ResponseEntity.ok(room);
     }
 
@@ -54,10 +54,9 @@ public class RoomController {
      * @return 업데이트된 방 정보
      */
     @PostMapping("/{roomId}/join")
-    public ResponseEntity<Room> joinRoom(@PathVariable Long roomId, @Valid @RequestBody JoinRoomRequest request) {
+    public ResponseEntity<RoomDTO> joinRoom(@PathVariable Long roomId, @Valid @RequestBody JoinRoomRequest request) {
         log.info("방 참여 요청. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
-        Room room = roomService.joinRoom(roomId, request.getUserId());
-        log.info("방 참여 완료. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
+        RoomDTO room = roomService.joinRoom(roomId, request.getUserId());        log.info("방 참여 완료. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
         return ResponseEntity.ok(room);
     }
 
@@ -68,9 +67,9 @@ public class RoomController {
      * @return 사용 가능한 방 목록
      */
     @GetMapping("/available")
-    public ResponseEntity<List<Room>> getAvailableRooms() {
+    public ResponseEntity<List<RoomDTO>> getAvailableRooms() {
         log.info("사용 가능한 방 목록 요청");
-        List<Room> rooms = roomService.getAvailableRooms();
+        List<RoomDTO> rooms = roomService.getAvailableRooms();
         log.info("사용 가능한 방 {} 개 조회됨", rooms.size());
         return ResponseEntity.ok(rooms);
     }
