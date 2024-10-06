@@ -2,6 +2,7 @@ package com.example.chessdotnet.repository;
 
 import com.example.chessdotnet.entity.Room;
 import com.example.chessdotnet.entity.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -13,6 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * RoomRepository의 JPA 테스트 클래스입니다.
+ *
+ * @author 전종영
  */
 @DataJpaTest
 class RoomRepositorySpringTest {
@@ -23,37 +26,77 @@ class RoomRepositorySpringTest {
     @Autowired
     private RoomRepository roomRepository;
 
+    private User testUser;
+
+    /**
+     * 각 테스트 메서드 실행 전에 호출되어 테스트 환경을 설정합니다.
+     *
+     * @author 전종영
+     */
+    @BeforeEach
+    void setUp() {
+        testUser = new User();
+        testUser.setUsername("testUser");
+        entityManager.persist(testUser);
+    }
+
+    /**
+     * 테스트용 Room 엔티티를 생성합니다.
+     *
+     * @author 전종영
+     * @param title 방 제목
+     * @param isGameStarted 게임 시작 여부
+     * @param maxPlayers 최대 플레이어 수
+     * @param currentPlayers 현재 플레이어 수
+     * @return 생성된 Room 엔티티
+     */
+    private Room createTestRoom(String title, boolean isGameStarted, int maxPlayers, int currentPlayers) {
+        Room room = new Room();
+        room.setTitle(title);
+        room.setGameStarted(isGameStarted);
+        room.setCreator(testUser);
+        room.setMaxPlayers(maxPlayers);
+        room.setCurrentPlayers(currentPlayers);
+        return entityManager.persist(room);
+    }
+
     /**
      * findByIsGameStartedFalse 메서드가 게임이 시작되지 않은 방만 반환하는지 테스트합니다.
+     *
+     * @author 전종영
      */
     @Test
     void findByIsGameStartedFalse_ShouldReturnOnlyAvailableRooms() {
-        // 먼저 User 엔티티를 생성하고 저장합니다.
-        User user = new User();
-        user.setUsername("testUser");
-        entityManager.persist(user);
-
-        Room availableRoom = new Room();
-        availableRoom.setTitle("Available Room");
-        availableRoom.setGameStarted(false);
-        availableRoom.setCreator(user);  // creator 설정
-        availableRoom.setMaxPlayers(2);  // maxPlayers 설정 (필요한 경우)
-        availableRoom.setCurrentPlayers(1);  // currentPlayers 설정 (필요한 경우)
-        entityManager.persist(availableRoom);
-
-        Room startedRoom = new Room();
-        startedRoom.setTitle("Started Room");
-        startedRoom.setGameStarted(true);
-        startedRoom.setCreator(user);  // creator 설정
-        startedRoom.setMaxPlayers(2);  // maxPlayers 설정 (필요한 경우)
-        startedRoom.setCurrentPlayers(2);  // currentPlayers 설정 (필요한 경우)
-        entityManager.persist(startedRoom);
+        createTestRoom("Available Room 1", false, 2, 1);
+        createTestRoom("Available Room 2", false, 2, 1);
+        createTestRoom("Started Room", true, 2, 2);
 
         entityManager.flush();
 
         List<Room> availableRooms = roomRepository.findByIsGameStartedFalse();
 
-        assertThat(availableRooms).hasSize(1);
-        assertThat(availableRooms.getFirst().getTitle()).isEqualTo("Available Room");
+        assertThat(availableRooms).hasSize(2)
+                .extracting(Room::getTitle)
+                .containsExactlyInAnyOrder("Available Room 1", "Available Room 2");
+    }
+
+    /**
+     * 모든 방을 조회하는 기능을 테스트합니다.
+     *
+     * @author 전종영
+     */
+    @Test
+    void findAll_ShouldReturnAllRooms() {
+        createTestRoom("Room 1", false, 2, 1);
+        createTestRoom("Room 2", true, 2, 2);
+        createTestRoom("Room 3", false, 4, 2);
+
+        entityManager.flush();
+
+        List<Room> allRooms = roomRepository.findAll();
+
+        assertThat(allRooms).hasSize(3)
+                .extracting(Room::getTitle)
+                .containsExactlyInAnyOrder("Room 1", "Room 2", "Room 3");
     }
 }

@@ -10,11 +10,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JoinRoomRequest DTO 클래스에 대한 단위 테스트입니다.
+ *
+ * @author 전종영
  */
 public class JoinRoomRequestTest {
 
     private Validator validator;
 
+    /**
+     * 각 테스트 메소드 실행 전에 Validator를 초기화합니다.
+     *
+     * @author 전종영
+     */
     @BeforeEach
     public void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -23,6 +30,8 @@ public class JoinRoomRequestTest {
 
     /**
      * 유효한 JoinRoomRequest 객체에 대한 검증을 테스트합니다.
+     *
+     * @author 전종영
      */
     @Test
     public void validJoinRoomRequest_ShouldPassValidation() {
@@ -30,11 +39,13 @@ public class JoinRoomRequestTest {
         request.setUserId(1L);
 
         var violations = validator.validate(request);
-        assertTrue(violations.isEmpty());
+        assertTrue(violations.isEmpty(), "유효한 요청은 검증을 통과해야 합니다.");
     }
 
     /**
      * userId가 null인 JoinRoomRequest 객체에 대한 검증을 테스트합니다.
+     *
+     * @author 전종영
      */
     @Test
     public void joinRoomRequestWithNullUserId_ShouldFailValidation() {
@@ -42,8 +53,9 @@ public class JoinRoomRequestTest {
         request.setUserId(null);
 
         var violations = validator.validate(request);
-        assertFalse(violations.isEmpty());
-        assertEquals(1, violations.size());
-        assertEquals("사용자 ID는 필수입니다", violations.iterator().next().getMessage());
+        assertFalse(violations.isEmpty(), "null userId는 검증에 실패해야 합니다.");
+        assertEquals(1, violations.size(), "하나의 위반 사항만 있어야 합니다.");
+        assertEquals("사용자 ID는 필수입니다", violations.iterator().next().getMessage(),
+                "올바른 오류 메시지가 반환되어야 합니다.");
     }
 }
