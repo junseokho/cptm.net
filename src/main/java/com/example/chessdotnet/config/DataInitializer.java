@@ -9,6 +9,8 @@ import org.springframework.boot.CommandLineRunner;
 /**
  * 애플리케이션 초기화 시 초기 데이터를 생성하는 클래스.
  * 주로 데이터베이스에 기본 데이터가 없을 경우 테스트 사용자 데이터를 생성하는 역할을 수행합니다.
+ *
+ * @author 전종영
  */
 @Configuration
 public class DataInitializer {

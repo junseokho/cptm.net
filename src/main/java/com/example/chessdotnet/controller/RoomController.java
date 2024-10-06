@@ -19,6 +19,8 @@ import java.util.List;
 
 /**
  * 방 관련 HTTP 요청을 처리하는 컨트롤러 클래스입니다.
+ *
+ * @author 전종영
  */
 @RestController
 @RequestMapping("/api/rooms")
@@ -31,6 +33,7 @@ public class RoomController {
     /**
      * 새로운 방을 생성합니다.
      *
+     * @author 전종영
      * @param request 방 생성 요청 정보
      * @return 생성된 방 정보
      */
@@ -45,6 +48,7 @@ public class RoomController {
     /**
      * 사용자가 특정 방에 참여합니다.
      *
+     * @author 전종영
      * @param roomId 참여할 방의 ID
      * @param request 방 참여 요청 정보
      * @return 업데이트된 방 정보
@@ -60,6 +64,7 @@ public class RoomController {
     /**
      * 사용 가능한 모든 방의 목록을 조회합니다.
      *
+     * @author 전종영
      * @return 사용 가능한 방 목록
      */
     @GetMapping("/available")
@@ -73,6 +78,7 @@ public class RoomController {
     /**
      * RoomNotFoundException 또는 UserNotFoundException 발생 시 처리합니다.
      *
+     * @author 전종영
      * @param ex 발생한 예외
      * @return 404 Not Found 응답
      */
@@ -85,6 +91,7 @@ public class RoomController {
     /**
      * 일반적인 예외 발생 시 처리합니다.
      *
+     * @author 전종영
      * @param ex 발생한 예외
      * @return 500 Internal Server Error 응답
      */
@@ -97,6 +104,7 @@ public class RoomController {
     /**
      * 입력 유효성 검사 실패 시 처리합니다.
      *
+     * @author 전종영
      * @param ex 발생한 예외
      * @return 400 Bad Request 응답
      */

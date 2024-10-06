@@ -12,6 +12,8 @@ import java.util.List;
 
 /**
  * 체스 게임 방 관련 비즈니스 로직을 처리하는 서비스 클래스입니다.
+ *
+ * @author 전종영
  */
 @Service // 비즈니스 로직을 담당하는 서비스 클래스임을 나타냄
 public class RoomService {
@@ -24,6 +26,7 @@ public class RoomService {
     /**
      * 새로운 방을 생성합니다.
      *
+     * @author 전종영
      * @param title 생성할 방의 제목
      * @param creatorId 방을 생성하는 사용자의 ID
      * @return 생성된 Room 객체
@@ -47,6 +50,7 @@ public class RoomService {
     /**
      * 사용자가 특정 게임 방에 참여합니다.
      *
+     * @author 전종영
      * @param roomId 참여할 방의 ID
      * @param userId 참여하는 사용자의 ID
      * @return 업데이트된 Room 객체
@@ -82,6 +86,7 @@ public class RoomService {
     /**
      * 게임이 시작되지 않은 모든 방의 목록을 조회합니다.
      *
+     * @author 전종영
      * @return 사용 가능한 Room 객체들의 List
      */
     public List<Room> getAvailableRooms() {
