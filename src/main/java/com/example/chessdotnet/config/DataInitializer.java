@@ -31,11 +31,18 @@ public class DataInitializer {
     public CommandLineRunner initData(UserRepository userRepository) {
         return args -> {
             if (userRepository.count() == 0) {
-                User user = new User();
-                user.setUsername("testUser");
-                User savedUser = userRepository.save(user);
+                User user1 = new User();
+                user1.setUsername("testUser");
+                User savedUser = userRepository.save(user1);
+
+                User user2 = new User();
+                user2.setUsername("testUser2");
+                User savedUser2 = userRepository.save(user2);
+
                 if (savedUser != null && savedUser.getId() != null) {
                     logger.info("Test user created - username: {}, userId: {}", savedUser.getUsername(), savedUser.getId());
+                } else if (savedUser2 != null && savedUser2.getId() != null) {
+                    logger.info("Test user created - username: {}, userId: {}", savedUser2.getUsername(), savedUser2.getId());
                 } else {
                     logger.error("Failed to create test user. Saved user is null or has no ID.");
                 }
