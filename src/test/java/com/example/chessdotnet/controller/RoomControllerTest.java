@@ -60,7 +60,6 @@ public class RoomControllerTest {
     /**
      * createRoom 엔드포인트가 정상적으로 방을 생성하는지 테스트합니다.
      *
-     * @author 전종영
      * @throws Exception 테스트 실행 중 예외 발생 시
      */
     @Test
@@ -88,7 +87,6 @@ public class RoomControllerTest {
     /**
      * createRoom 엔드포인트에 대한 입력 유효성 검사를 테스트합니다.
      *
-     * @author 전종영
      * @throws Exception 테스트 실행 중 예외 발생 시
      */
     @Test
@@ -109,7 +107,6 @@ public class RoomControllerTest {
     /**
      * joinRoom 엔드포인트가 정상적으로 사용자를 방에 참여시키는지 테스트합니다.
      *
-     * @author 전종영
      * @throws Exception 테스트 실행 중 예외 발생 시
      */
     @Test
@@ -136,7 +133,6 @@ public class RoomControllerTest {
     /**
      * joinRoom 엔드포인트에 대한 입력 유효성 검사를 테스트합니다.
      *
-     * @author 전종영
      * @throws Exception 테스트 실행 중 예외 발생 시
      */
     @Test
@@ -156,7 +152,6 @@ public class RoomControllerTest {
     /**
      * getAvailableRooms 엔드포인트가 사용 가능한 방 목록을 반환하는지 테스트합니다.
      *
-     * @author 전종영
      * @throws Exception 테스트 실행 중 예외 발생 시
      */
     @Test
@@ -187,7 +182,6 @@ public class RoomControllerTest {
     /**
      * 존재하지 않는 방에 대한 요청 시 적절한 예외 처리를 하는지 테스트합니다.
      *
-     * @author 전종영
      * @throws Exception 테스트 실행 중 예외 발생 시
      */
     @Test
@@ -205,7 +199,6 @@ public class RoomControllerTest {
     /**
      * 존재하지 않는 사용자로 방 생성 시 적절한 예외 처리를 하는지 테스트합니다.
      *
-     * @author 전종영
      * @throws Exception 테스트 실행 중 예외 발생 시
      */
     @Test
@@ -223,7 +216,6 @@ public class RoomControllerTest {
     /**
      * 일반적인 예외 발생 시 적절한 처리를 하는지 테스트합니다.
      *
-     * @author 전종영
      * @throws Exception 테스트 실행 중 예외 발생 시
      */
     @Test

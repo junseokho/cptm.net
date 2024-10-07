@@ -13,8 +13,6 @@ public class JoinRoomRequest {
     /**
      * 방에 참여하려는 사용자의 ID입니다.
      * 이 필드는 null이 될 수 없습니다.
-     *
-     * @author 전종영
      */
     @NotNull(message = "사용자 ID는 필수입니다")
     private Long userId; // 방에 참여하려는 사용자 ID

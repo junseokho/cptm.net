@@ -12,8 +12,6 @@ public class RoomDTOTest {
 
     /**
      * RoomDTO 객체의 생성 및 getter/setter 메소드를 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     public void testRoomDTOCreationAndGetterSetter() {
@@ -38,8 +36,6 @@ public class RoomDTOTest {
 
     /**
      * RoomDTO 객체의 equals 메소드를 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     public void testRoomDTOEquals() {
@@ -61,8 +57,6 @@ public class RoomDTOTest {
 
     /**
      * RoomDTO 객체의 hashCode 메소드를 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     public void testRoomDTOHashCode() {

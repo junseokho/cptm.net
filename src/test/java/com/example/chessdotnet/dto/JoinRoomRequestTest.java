@@ -19,8 +19,6 @@ public class JoinRoomRequestTest {
 
     /**
      * 각 테스트 메소드 실행 전에 Validator를 초기화합니다.
-     *
-     * @author 전종영
      */
     @BeforeEach
     public void setUp() {
@@ -30,8 +28,6 @@ public class JoinRoomRequestTest {
 
     /**
      * 유효한 JoinRoomRequest 객체에 대한 검증을 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     public void validJoinRoomRequest_ShouldPassValidation() {
@@ -44,8 +40,6 @@ public class JoinRoomRequestTest {
 
     /**
      * userId가 null인 JoinRoomRequest 객체에 대한 검증을 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     public void joinRoomRequestWithNullUserId_ShouldFailValidation() {

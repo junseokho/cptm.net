@@ -21,8 +21,6 @@ public class CreateRoomRequestTest {
 
     /**
      * 각 테스트 메소드 실행 전에 Validator를 초기화합니다.
-     *
-     * @author 전종영
      */
     @BeforeEach
     public void setUp() {
@@ -32,8 +30,6 @@ public class CreateRoomRequestTest {
 
     /**
      * 유효한 CreateRoomRequest 객체에 대한 검증을 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     public void validCreateRoomRequest_ShouldPassValidation() {
@@ -48,7 +44,6 @@ public class CreateRoomRequestTest {
     /**
      * 다양한 무효한 제목에 대한 CreateRoomRequest 객체 검증을 테스트합니다.
      *
-     * @author 전종영
      * @param title 테스트할 제목
      */
     @ParameterizedTest
@@ -66,8 +61,6 @@ public class CreateRoomRequestTest {
 
     /**
      * creatorId가 null인 CreateRoomRequest 객체에 대한 검증을 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     public void createRoomRequestWithNullCreatorId_ShouldFailValidation() {

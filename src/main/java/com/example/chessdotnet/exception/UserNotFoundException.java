@@ -9,7 +9,6 @@ public class UserNotFoundException extends RuntimeException {
     /**
      * 지정된 오류 메시지로 새 UserNotFoundException을 생성합니다.
      *
-     * @author 전종영
      * @param message 예외에 대한 상세 메시지
      */
     public UserNotFoundException(String message) {

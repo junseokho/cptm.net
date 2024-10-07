@@ -26,7 +26,6 @@ public class DataInitializer {
      *
      * @param userRepository 사용자 데이터를 저장할 UserRepository
      * @return CommandLineRunner로, 애플리케이션 시작 시 실행됩니다.
-     * @author 전종영
      */
     @Bean
     public CommandLineRunner initData(UserRepository userRepository) {

@@ -27,7 +27,6 @@ public class UserRepositoryTest {
     /**
      * 테스트용 User 엔티티를 생성합니다.
      *
-     * @author 전종영
      * @param username 사용자 이름
      * @return 생성된 User 엔티티
      */
@@ -39,8 +38,6 @@ public class UserRepositoryTest {
 
     /**
      * 사용자 저장 및 ID로 조회 기능을 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     void saveAndFindById_ShouldWorkCorrectly() {
@@ -56,8 +53,6 @@ public class UserRepositoryTest {
 
     /**
      * 모든 사용자를 조회하는 기능을 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     void findAll_ShouldReturnAllUsers() {
@@ -76,8 +71,6 @@ public class UserRepositoryTest {
 
     /**
      * 사용자 삭제 기능을 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     void deleteUser_ShouldRemoveUserFromDatabase() {
@@ -94,8 +87,6 @@ public class UserRepositoryTest {
 
     /**
      * 사용자 업데이트 기능을 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     void updateUser_ShouldChangeUserProperties() {

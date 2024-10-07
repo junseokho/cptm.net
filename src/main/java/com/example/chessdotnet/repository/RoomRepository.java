@@ -17,7 +17,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     /**
      * 게임이 시작되지 않은 모든 방을 조회합니다.
      *
-     * @author 전종영
      * @return 게임이 시작되지 않은 Room 객체들의 List
      */
     List<Room> findByIsGameStartedFalse();

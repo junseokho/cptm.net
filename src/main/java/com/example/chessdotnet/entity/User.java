@@ -39,7 +39,6 @@ public class User {
     /**
      * User 엔티티를 UserDTO로 변환합니다.
      *
-     * @author 전종영
      * @return 변환된 UserDTO 객체
      */
     public UserDTO toDTO() {

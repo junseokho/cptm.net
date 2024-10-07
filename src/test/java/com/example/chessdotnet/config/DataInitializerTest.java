@@ -30,7 +30,6 @@ public class DataInitializerTest {
      * 데이터베이스가 비어있을 때 initData 메서드가 테스트 사용자를 올바르게 생성하는지 검증하는 테스트.
      *
      * @throws Exception 테스트 실행 중 예외가 발생할 경우
-     * @author 전종영
      */
     @Test
     void givenEmptyDatabase_whenInitData_thenShouldCreateTestUser() throws Exception {
@@ -54,7 +53,6 @@ public class DataInitializerTest {
      * 데이터베이스에 이미 사용자가 존재할 때 initData 메서드가 새 사용자를 생성하지 않는지 검증하는 테스트.
      *
      * @throws Exception 테스트 실행 중 예외가 발생할 경우
-     * @author 전종영
      */
     @Test
     void givenNonEmptyDatabase_whenInitData_thenShouldNotCreateTestUser() throws Exception {

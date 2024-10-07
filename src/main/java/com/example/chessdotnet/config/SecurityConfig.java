@@ -20,7 +20,6 @@ public class SecurityConfig {
     /**
      * 보안 필터 체인을 구성합니다.
      *
-     * @author 전종영
      * @param http HttpSecurity 객체
      * @return 구성된 SecurityFilterChain
      * @throws Exception 보안 설정 중 발생할 수 있는 예외

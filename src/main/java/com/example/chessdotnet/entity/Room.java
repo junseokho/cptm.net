@@ -56,7 +56,6 @@ public class Room {
     /**
      * Room 엔티티를 RoomDTO로 변환합니다.
      *
-     * @author 전종영
      * @return 변환된 RoomDTO 객체
      */
     public RoomDTO toDTO() {

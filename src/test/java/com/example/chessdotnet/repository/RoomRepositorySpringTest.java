@@ -30,8 +30,6 @@ class RoomRepositorySpringTest {
 
     /**
      * 각 테스트 메서드 실행 전에 호출되어 테스트 환경을 설정합니다.
-     *
-     * @author 전종영
      */
     @BeforeEach
     void setUp() {
@@ -43,7 +41,6 @@ class RoomRepositorySpringTest {
     /**
      * 테스트용 Room 엔티티를 생성합니다.
      *
-     * @author 전종영
      * @param title 방 제목
      * @param isGameStarted 게임 시작 여부
      * @param maxPlayers 최대 플레이어 수
@@ -62,8 +59,6 @@ class RoomRepositorySpringTest {
 
     /**
      * findByIsGameStartedFalse 메서드가 게임이 시작되지 않은 방만 반환하는지 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     void findByIsGameStartedFalse_ShouldReturnOnlyAvailableRooms() {
@@ -82,8 +77,6 @@ class RoomRepositorySpringTest {
 
     /**
      * 모든 방을 조회하는 기능을 테스트합니다.
-     *
-     * @author 전종영
      */
     @Test
     void findAll_ShouldReturnAllRooms() {

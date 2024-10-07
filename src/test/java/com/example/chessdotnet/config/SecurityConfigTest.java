@@ -33,7 +33,6 @@ public class SecurityConfigTest {
      * 인증되지 않은 사용자가 보호된 엔드포인트에 접근할 수 없는지 테스트합니다.
      *
      * @throws Exception 테스트 실행 중 예외 발생 시
-     * @author 전종영
      */
     @Test
     public void givenUnauthenticatedUser_whenAccessingProtectedEndpoint_thenShouldReturnUnauthorized() throws Exception {
@@ -47,7 +46,6 @@ public class SecurityConfigTest {
      * 인증된 사용자가 보호된 엔드포인트에 접근할 수 있는지 테스트합니다.
      *
      * @throws Exception 테스트 실행 중 예외 발생 시
-     * @author 전종영
      */
     @Test
     @WithMockUser
@@ -66,7 +64,6 @@ public class SecurityConfigTest {
      * 모든 사용자가 '/api/rooms/available' 엔드포인트에 접근할 수 있는지 테스트합니다.
      *
      * @throws Exception 테스트 실행 중 예외 발생 시
-     * @author 전종영
      */
     @Test
     public void givenAnyUser_whenAccessingAvailableRoomsEndpoint_thenShouldBeAllowed() throws Exception {
@@ -78,7 +75,6 @@ public class SecurityConfigTest {
      * CSRF 보호가 비활성화되어 있는지 테스트합니다.
      *
      * @throws Exception 테스트 실행 중 예외 발생 시
-     * @author 전종영
      */
     @Test
     @WithMockUser
