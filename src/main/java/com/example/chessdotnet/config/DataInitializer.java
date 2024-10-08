@@ -20,9 +20,9 @@ public class DataInitializer {
     private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 
     /**
-     * 초기 데이터가 없을 경우 테스트 사용자를 생성하는 CommandLineRunner.
+     * 초기 데이터를 생성하는 CommandLineRunner.
      * Spring Boot 애플리케이션이 실행될 때 자동으로 실행되며,
-     * 데이터베이스에 사용자가 없을 경우 테스트 사용자("testUser")를 생성합니다.
+     * 데이터베이스에 테스트 사용자를 생성합니다.
      *
      * @param userRepository 사용자 데이터를 저장할 UserRepository
      * @return CommandLineRunner로, 애플리케이션 시작 시 실행됩니다.
@@ -30,25 +30,24 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initData(UserRepository userRepository) {
         return args -> {
-            if (userRepository.count() == 0) {
-                User user1 = new User();
-                user1.setUsername("testUser");
-                User savedUser = userRepository.save(user1);
+            logger.info("Initializing database...");
 
-                User user2 = new User();
-                user2.setUsername("testUser2");
-                User savedUser2 = userRepository.save(user2);
+            User user1 = new User();
+            user1.setUsername("testUser1");
+            User savedUser1 = userRepository.save(user1);
 
-                if (savedUser != null && savedUser.getId() != null) {
-                    logger.info("Test user created - username: {}, userId: {}", savedUser.getUsername(), savedUser.getId());
-                } else if (savedUser2 != null && savedUser2.getId() != null) {
-                    logger.info("Test user created - username: {}, userId: {}", savedUser2.getUsername(), savedUser2.getId());
-                } else {
-                    logger.error("Failed to create test user. Saved user is null or has no ID.");
-                }
-            } else {
-                logger.info("User data already exists. Skipping initialization.");
+            User user2 = new User();
+            user2.setUsername("testUser2");
+            User savedUser2 = userRepository.save(user2);
+
+            if (savedUser1 != null && savedUser1.getId() != null) {
+                logger.info("Test user created - username: {}, userId: {}", savedUser1.getUsername(), savedUser1.getId());
             }
+            if (savedUser2 != null && savedUser2.getId() != null) {
+                logger.info("Test user created - username: {}, userId: {}", savedUser2.getUsername(), savedUser2.getId());
+            }
+
+            logger.info("Database initialization completed.");
         };
     }
 }

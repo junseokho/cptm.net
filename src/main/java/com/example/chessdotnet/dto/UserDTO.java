@@ -12,7 +12,7 @@ public class UserDTO {
     /** 사용자의 고유 식별자 */
     private Long id;
 
-    /** 사용자의 이름 */
+    /** 사용자의 고유한 이름 */
     private String username;
 
     /** 사용자가 생성한 방의 수 */
