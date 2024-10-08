@@ -1,6 +1,6 @@
-import React from 'react';
 
-export class Piece {
+
+export class Piece {//기물 상위 클래스
     constructor(name, position, color, image) {
         this.name = name;
         this.position = position;
@@ -8,10 +8,10 @@ export class Piece {
         this.image = image;
     }
 
-    isValidMove(position, board) {
+    isValidMove(position, board) {//다른 기물 존재 여부 확인
         if (position.x < 0 || position.x > 7 || position.y < 0 || position.y > 7) return false;
         const pieceAtDestination = board[position.y][position.x];
-        return !(pieceAtDestination && (pieceAtDestination.color === this.color));
+        return !(pieceAtDestination);
 
     }
 }

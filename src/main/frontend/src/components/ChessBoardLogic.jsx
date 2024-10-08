@@ -4,55 +4,62 @@ import { Rook, Knight, Bishop, Queen, King, Pawn } from './Piece.jsx';
 
 const initialBoardSetup = [
     [
-        new Rook('Rook', { x: 0, y: 0 }, 'white', '../assets/wR.svg'),
-        new Knight('Knight', { x: 1, y: 0 }, 'white', '../assets/wN.svg'),
-        new Bishop('Bishop', { x: 2, y: 0 }, 'white', '../assets/wB.svg'),
-        new Queen('Queen', { x: 3, y: 0 }, 'white', '../assets/wQ.svg'),
-        new King('King', { x: 4, y: 0 }, 'white', '../assets/wK.svg'),
-        new Bishop('Bishop', { x: 5, y: 0 }, 'white', '../assets/wB.svg'),
-        new Knight('Knight', { x: 6, y: 0 }, 'white', '../assets/wN.svg'),
-        new Rook('Rook', { x: 7, y: 0 }, 'white', '../assets/wR.svg'),
+        new Rook('Rook', { x: 0, y: 0 }, 'black', '/src/assets/bR.svg'),
+        new Knight('Knight', { x: 1, y: 0 }, 'black', '/src/assets/bN.svg'),
+        new Bishop('Bishop', { x: 2, y: 0 }, 'black', '/src/assets/bB.svg'),
+        new Queen('Queen', { x: 3, y: 0 }, 'black', '/src/assets/bQ.svg'),
+        new King('King', { x: 4, y: 0 }, 'black', '/src/assets/bK.svg'),
+        new Bishop('Bishop', { x: 5, y: 0 }, 'black', '/src/assets/bB.svg'),
+        new Knight('Knight', { x: 6, y: 0 }, 'black', '/src/assets/bN.svg'),
+        new Rook('Rook', { x: 7, y: 0 }, 'black', '/src/assets/bR.svg'),
     ],
-    Array(8).fill(null).map((_, idx) => new Pawn('Pawn', { x: idx, y: 1 }, 'white', '/images/white-pawn.png')), // White pawns
-    Array(8).fill(null), // Empty row
-    Array(8).fill(null), // Empty row
-    Array(8).fill(null), // Empty row
-    Array(8).fill(null), // Empty row
-    Array(8).fill(null).map((_, idx) => new Pawn('Pawn', { x: idx, y: 6 }, 'black', '/images/black-pawn.png')), // Black pawns
+    Array(8).fill(null).map((_, idx) => new Pawn('Pawn', { x: idx, y: 1 }, 'black', '/src/assets/bP.svg')),
+    Array(8).fill(null),
+    Array(8).fill(null),
+    Array(8).fill(null),
+    Array(8).fill(null),
+    Array(8).fill(null).map((_, idx) => new Pawn('Pawn', { x: idx, y: 6 }, 'white', '/src/assets/wP.svg')),
     [
-        new Rook('Rook', { x: 0, y: 7 }, 'black', '../assets/bR.svg'),
-        new Knight('Knight', { x: 1, y: 7 }, 'black', '../assets/bN.svg'),
-        new Bishop('Bishop', { x: 2, y: 7 }, 'black', '../assets/bB.svg'),
-        new Queen('Queen', { x: 3, y: 7 }, 'black', '../assets/bQ.svg'),
-        new King('King', { x: 4, y: 7 }, 'black', '../assets/bK.svg'),
-        new Bishop('Bishop', { x: 5, y: 7 }, 'black', '../assets/bB.svg'),
-        new Knight('Knight', { x: 6, y: 7 }, 'black', '../assets/bN.svg'),
-        new Rook('Rook', { x: 7, y: 7 }, 'black', '../assets/bR.svg'),
+        new Rook('Rook', { x: 0, y: 7 }, 'white', '/src/assets/wR.svg'),
+        new Knight('Knight', { x: 1, y: 7 }, 'white', '/src/assets/wN.svg'),
+        new Bishop('Bishop', { x: 2, y: 7 }, 'white', '/src/assets/wB.svg'),
+        new Queen('Queen', { x: 3, y: 7 }, 'white', '/src/assets/wQ.svg'),
+        new King('King', { x: 4, y: 7 }, 'white', '/src/assets/wK.svg'),
+        new Bishop('Bishop', { x: 5, y: 7 }, 'white', '/src/assets/wB.svg'),
+        new Knight('Knight', { x: 6, y: 7 }, 'white', '/src/assets/wN.svg'),
+        new Rook('Rook', { x: 7, y: 7 }, 'white', '/src/assets/wR.svg'),
     ]
 ];
 
 const ChessBoardLogic = () => {
-    const [board] = useState(initialBoardSetup); // setBoard 제거
+    const [board] = useState(initialBoardSetup);
+    const [highlightedSquares, setHighlightedSquares] = useState([]);
+    const [selectedSquare, setSelectedSquare] = useState(null);
 
-    const handlePieceClick = (piece) => { // row, col 제거
+    const handlePieceClick = (piece, position) => {
+        // 선택 상태 초기화
+        setHighlightedSquares([]);
+        setSelectedSquare(null);
+
         if (piece) {
             const availableMoves = piece.getAvailableMoves(board);
-            highlightMoves(availableMoves);
+            console.log(`Selected piece: ${piece.name}`);
+            console.log('Available moves:', availableMoves);
+
+            // 이동 가능한 칸 상태 업데이트
+            setHighlightedSquares(availableMoves);
+            setSelectedSquare(position);
         }
     };
 
-    const highlightMoves = (moves) => {
-        moves.forEach((move) => {
-            const cell = document.querySelector(`[data-position="${move.x}-${move.y}"]`);
-            if (cell) {
-                cell.classList.add('highlight');
-            }
-        });
-    };
-
     return (
-        <ChessBoard board={board} onPieceClick={handlePieceClick} />
+        <ChessBoard
+            board={board}
+            onPieceClick={handlePieceClick}
+            highlightedSquares={highlightedSquares}
+            selectedSquare={selectedSquare}
+        />
     );
 };
 
-export default ChessBoardLogic; // 디폴트 내보내기 유지
+export default ChessBoardLogic;
