@@ -1,0 +1,45 @@
+/* 보드 및 칸 스타일 */
+.chess-board {
+    display: inline-block;
+    border: 2px solid black;
+}
+
+.board-row {
+    display: flex;
+}
+
+.square {
+    width: 50px;
+    height: 50px;
+    position: relative;
+}
+
+.light-brown {
+    background-color: #D2B48C; /* 연한 갈색 */
+}
+
+.white {
+    background-color: white;
+}
+
+/* 이동 가능한 칸에 초록색 원 표시 */
+.highlight::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px; /* 원의 크기 */
+    height: 20px;
+    background-color: rgba(0, 255, 0, 0.6); /* 초록색, 투명도 추가 */
+    border-radius: 50%;
+    transform: translate(-50%, -50%); /* 원을 칸 중앙으로 정렬 */
+}
+
+.selected {
+    background-color: rgba(0, 255, 0, 0.6) ; /* 선택된 기물 표시 */
+}
+
+.piece {
+    width: 100%;
+    height: 100%;
+}
