@@ -5,10 +5,12 @@ import com.example.chessdotnet.entity.Room;
 import com.example.chessdotnet.entity.User;
 import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
+import com.example.chessdotnet.exception.UserNotInRoomException;
 import org.springframework.stereotype.Service;
 import com.example.chessdotnet.repository.RoomRepository;
 import com.example.chessdotnet.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,5 +89,65 @@ public class RoomService {
         return roomRepository.findByIsGameStartedFalse().stream()
                 .map(Room::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 사용자가 방을 나가는 기능을 처리합니다.
+     *
+     * @param roomId 나가려는 방의 ID
+     * @param userId 나가려는 사용자의 ID
+     * @return 업데이트된 방 정보. 방이 삭제된 경우 null을 반환
+     * @throws RoomNotFoundException 지정된 ID의 방을 찾을 수 없는 경우
+     * @throws UserNotFoundException 지정된 ID의 사용자를 찾을 수 없는 경우
+     * @throws UserNotInRoomException 사용자가 해당 방에 없는 경우
+     */
+    @Transactional
+    public RoomDTO leaveRoom(Long roomId, Long userId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!room.getPlayers().contains(user)) {
+            throw new UserNotInRoomException("User is not in the room");
+        }
+
+        room.getPlayers().remove(user);
+        room.setCurrentPlayers(room.getCurrentPlayers() - 1);
+
+        if (room.getCreator().equals(user)) {
+            if (room.getPlayers().isEmpty()) {
+                roomRepository.delete(room);
+                return null;
+            } else {
+                room.setCreator(room.getPlayers().iterator().next());
+            }
+        }
+
+        Room updatedRoom = roomRepository.save(room);
+        return updatedRoom.toDTO();
+    }
+
+    /**
+     * 방을 삭제하는 기능을 처리합니다.
+     *
+     * @param roomId 삭제할 방의 ID
+     * @param userId 삭제를 요청한 사용자의 ID
+     * @throws RoomNotFoundException 지정된 ID의 방을 찾을 수 없는 경우
+     * @throws UserNotFoundException 지정된 ID의 사용자를 찾을 수 없는 경우
+     * @throws IllegalStateException 방 생성자가 아닌 사용자가 삭제를 시도하는 경우
+     */
+    @Transactional
+    public void deleteRoom(Long roomId, Long userId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!room.getCreator().equals(user)) {
+            throw new IllegalStateException("Only the room creator can delete the room");
+        }
+
+        roomRepository.delete(room);
     }
 }

@@ -2,10 +2,12 @@ package com.example.chessdotnet.controller;
 
 import com.example.chessdotnet.dto.CreateRoomRequest;
 import com.example.chessdotnet.dto.JoinRoomRequest;
+import com.example.chessdotnet.dto.LeaveRoomRequest;
 import com.example.chessdotnet.dto.RoomDTO;
 import com.example.chessdotnet.entity.Room;
 import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
+import com.example.chessdotnet.exception.UserNotInRoomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -68,6 +70,64 @@ public class RoomController {
         List<RoomDTO> rooms = roomService.getAvailableRooms();
         log.info("사용 가능한 방 {} 개 조회됨", rooms.size());
         return ResponseEntity.ok(rooms);
+    }
+
+    /**
+     * 사용자가 방을 나가는 요청을 처리합니다.
+     *
+     * @param roomId 나가려는 방의 ID
+     * @param request 방을 나가려는 사용자의 정보
+     * @return 업데이트된 방 정보 또는 방이 삭제되었을 경우 204 No Content
+     */
+    @PostMapping("/{roomId}/leave")
+    public ResponseEntity<RoomDTO> leaveRoom(@PathVariable Long roomId, @Valid @RequestBody LeaveRoomRequest request) {
+        log.info("방 나가기 요청. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
+        RoomDTO room = roomService.leaveRoom(roomId, request.getUserId());
+        if (room == null) {
+            log.info("방 삭제됨. 방 ID: {}", roomId);
+            return ResponseEntity.noContent().build();
+        }
+        log.info("방 나가기 완료. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
+        return ResponseEntity.ok(room);
+    }
+
+    /**
+     * 방을 삭제하는 요청을 처리합니다.
+     *
+     * @param roomId 삭제할 방의 ID
+     * @param userId 삭제를 요청한 사용자의 ID
+     * @return 204 No Content
+     */
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId, @RequestParam Long userId) {
+        log.info("방 삭제 요청. 방 ID: {}, 사용자 ID: {}", roomId, userId);
+        roomService.deleteRoom(roomId, userId);
+        log.info("방 삭제 완료. 방 ID: {}", roomId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * UserNotInRoomException 발생 시 처리합니다.
+     *
+     * @param ex 발생한 예외
+     * @return 400 Bad Request 응답
+     */
+    @ExceptionHandler(UserNotInRoomException.class)
+    public ResponseEntity<String> handleUserNotInRoomException(UserNotInRoomException ex) {
+        log.error("User not in room error: ", ex);
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    /**
+     * IllegalStateException 발생 시 처리합니다.
+     *
+     * @param ex 발생한 예외
+     * @return 400 Bad Request 응답
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+        log.error("Illegal state error: ", ex);
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
     /**
