@@ -1,0 +1,36 @@
+.lobby {
+  background: #323232;
+  padding: 10px;
+  height: 500px;
+}
+
+.hooks-list {
+  border: 1px #a39485 solid;
+  font-size: .9em;
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 5px;
+  overflow: hidden;
+
+  th {
+    text-align: left;
+  }
+
+  thead {
+    font-weight: bold;
+    color: #fff;
+    background: #323232;
+  }
+
+  .hook-join {
+    td, th {
+      padding: 1em .5em;
+      vertical-align: middle;
+    }
+
+    td {
+      border-bottom: 1px solid rgba(0,0,0,.1);
+      background: #fff;
+    }
+  }
+}
