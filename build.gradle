@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'  // JaCoCo plugin 추가
 }
 
 group = 'com.example'
@@ -25,13 +26,52 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'mysql:mysql-connector-java:8.0.33'
+
     compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'com.h2database:h2'  // H2 Database 추가
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //runtimeOnly 'com.h2database:h2' // 개발/테스트용
+    runtimeOnly 'mysql:mysql-connector-java:8.0.33'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport  // 테스트 후 JaCoCo 보고서 생성
 }
+
+jacocoTestReport {
+    dependsOn test  // 테스트가 실행된 후에 보고서 생성
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.8  // 최소 80% 코드 커버리지 요구
+            }
+        }
+    }
+}
+
+test {
+    jvmArgs '-XX:+IgnoreUnrecognizedVMOptions', '--add-opens=java.base/java.lang=ALL-UNNAMED', '-XX:+EnableDynamicAgentLoading'
+}
+
+check.dependsOn jacocoTestCoverageVerification  // 빌드 시 코드 커버리지 검증
