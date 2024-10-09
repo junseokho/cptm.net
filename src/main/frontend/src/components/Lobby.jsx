@@ -24,9 +24,9 @@ import { MatchAPI } from '../apis/MatchAPI.js'
 function MatchListCard(match_title, host_rating, time_control, match_id) {
     return (
         <>
-            <tr className='details-table' onClick={ () => {
+            <tr className='hook-join' onClick={ () => {
                 // todo user_id 는 현재 임시값
-                const joining_room = MatchAPI.join_match(match_id, 1);
+                // const joining_room = MatchAPI.join_match(match_id, 1);
                 // todo 받은 방 정보로 처리하기 (방 입장 성공/실패 정보를 받아와야함 + 입장 성공하면 실제 게임 화면을 만들어야함)
             }}>
                 <td> {match_title} </td><td> {host_rating} </td><td> {time_control} </td>
@@ -69,7 +69,7 @@ function MatchList() {
     const match_cards = available_matches.map((e) => MatchListCard(e.title, e.host_rating, e.time_control, e.match_id));
     return (
         <>
-            <table className='details-table'>
+            <table className='hooks-list'>
                 <thead>
                     <tr>
                         <th>title</th><th>rating</th><th>time control</th>
@@ -92,7 +92,7 @@ function MatchList() {
 export default function Lobby() {
     return (
         <>
-            <div className='block'>
+            <div className='lobby'>
                     <MatchList/>
             </div>
         </>
