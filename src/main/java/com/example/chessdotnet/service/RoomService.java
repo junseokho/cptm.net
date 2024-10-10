@@ -115,6 +115,11 @@ public class RoomService {
         room.getPlayers().remove(user);
         room.setCurrentPlayers(room.getCurrentPlayers() - 1);
 
+        // 게임이 시작되었고 플레이어가 1명 이하가 되면 게임 종료
+        if (room.isGameStarted() && room.getCurrentPlayers() <= 1) {
+            room.setGameStarted(false);
+        }
+
         if (room.getCreator().equals(user)) {
             if (room.getPlayers().isEmpty()) {
                 roomRepository.delete(room);
@@ -147,6 +152,10 @@ public class RoomService {
         if (!room.getCreator().equals(user)) {
             throw new IllegalStateException("Only the room creator can delete the room");
         }
+
+        // 방 삭제 전 방에 잇는 모든 유저 삭제
+        room.getPlayers().clear();
+        room.setCurrentPlayers(0);
 
         roomRepository.delete(room);
     }
