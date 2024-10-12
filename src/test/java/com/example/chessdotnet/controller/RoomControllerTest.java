@@ -78,8 +78,8 @@ public class RoomControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(testRoom.getId()))
                 .andExpect(jsonPath("$.title").value(testRoom.getTitle()))
-                .andExpect(jsonPath("$.creatorId").value(testRoom.getHostId()))
-                .andExpect(jsonPath("$.creatorUsername").value(testRoom.getHostUsername()))
+                .andExpect(jsonPath("$.hostId").value(testRoom.getHostId()))
+                .andExpect(jsonPath("$.hostUsername").value(testRoom.getHostUsername()))
                 .andExpect(jsonPath("$.currentPlayers").value(testRoom.getPlayersCount()))
                 .andExpect(jsonPath("$.maxPlayers").value(testRoom.getMaxPlayers()));
     }
@@ -173,10 +173,10 @@ public class RoomControllerTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").value(testRoom.getId()))
                 .andExpect(jsonPath("$[0].title").value(testRoom.getTitle()))
-                .andExpect(jsonPath("$[0].creatorUsername").value(testRoom.getHostUsername()))
+                .andExpect(jsonPath("$[0].hostUsername").value(testRoom.getHostUsername()))
                 .andExpect(jsonPath("$[1].id").value(room2.getId()))
                 .andExpect(jsonPath("$[1].title").value(room2.getTitle()))
-                .andExpect(jsonPath("$[1].creatorUsername").value(room2.getHostUsername()));
+                .andExpect(jsonPath("$[1].hostUsername").value(room2.getHostUsername()));
     }
 
     /**
@@ -209,7 +209,7 @@ public class RoomControllerTest {
         mockMvc.perform(post("/api/rooms/create")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": \"Test Room\", \"creatorId\": 999}"))
+                        .content("{\"title\": \"Test Room\", \"hostId\": 999}"))
                 .andExpect(status().isNotFound());
     }
 
@@ -226,7 +226,7 @@ public class RoomControllerTest {
         mockMvc.perform(post("/api/rooms/create")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": \"Test Room\", \"creatorId\": 1}"))
+                        .content("{\"title\": \"Test Room\", \"hostId\": 1}"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().string("예기치 않은 오류가 발생했습니다"));
     }
