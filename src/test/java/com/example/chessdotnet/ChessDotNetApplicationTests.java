@@ -99,8 +99,8 @@ class ChessDotNetIntegrationTest {
         // 새 방 생성
         Room newRoom = new Room();
         newRoom.setTitle("Test Room");
-        newRoom.setCreator(creator);
-        newRoom.setCurrentPlayers(1);
+        newRoom.setHost(creator);
+        newRoom.setPlayersCount(1);
         newRoom.setMaxPlayers(2);
         newRoom.setGameStarted(false);
         Room savedRoom = roomRepository.save(newRoom);

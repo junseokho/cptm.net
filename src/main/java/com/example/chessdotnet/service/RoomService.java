@@ -32,17 +32,17 @@ public class RoomService {
      * 새로운 방을 생성합니다.
      *
      * @param title 생성할 방의 제목
-     * @param creatorId 방을 생성하는 사용자의 ID
+     * @param hostId 방을 생성하는 사용자의 ID
      * @return 생성된 Room의 DTO
      * @throws UserNotFoundException 지정된 ID의 사용자를 찾을 수 없는 경우
      */
-    public RoomDTO createRoom(String title, Long creatorId) {
-        User creator = userRepository.findById(creatorId)
+    public RoomDTO createRoom(String title, Long hostId) {
+        User host = userRepository.findById(hostId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         Room room = new Room();
         room.setTitle(title);
-        room.setCreator(creator);
-        room.getPlayers().add(creator);
+        room.setHost(host);
+        room.getPlayers().add(host);
         Room savedRoom = roomRepository.save(room);
         return savedRoom.toDTO();
     }
@@ -63,16 +63,16 @@ public class RoomService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         // 방이 가득 찼는지 확인
-        if (room.getCurrentPlayers() >= room.getMaxPlayers()) {
+        if (room.getPlayersCount() >= room.getMaxPlayers()) {
             throw new RuntimeException("Room is full");
         }
 
         // 사용자를 방에 추가
         room.getPlayers().add(user);
-        room.setCurrentPlayers(room.getCurrentPlayers() + 1);
+        room.setPlayersCount(room.getPlayersCount() + 1);
 
         // 방이 가득 찼다면 게임 시작 상태로 변경
-        if (room.getCurrentPlayers() == room.getMaxPlayers()) {
+        if (room.getPlayersCount() == room.getMaxPlayers()) {
             room.setGameStarted(true);
         }
 
@@ -113,19 +113,19 @@ public class RoomService {
         }
 
         room.getPlayers().remove(user);
-        room.setCurrentPlayers(room.getCurrentPlayers() - 1);
+        room.setPlayersCount(room.getPlayersCount() - 1);
 
         // 게임이 시작되었고 플레이어가 1명 이하가 되면 게임 종료
-        if (room.isGameStarted() && room.getCurrentPlayers() <= 1) {
+        if (room.isGameStarted() && room.getPlayersCount() <= 1) {
             room.setGameStarted(false);
         }
 
-        if (room.getCreator().equals(user)) {
+        if (room.getHost().equals(user)) {
             if (room.getPlayers().isEmpty()) {
                 roomRepository.delete(room);
                 return null;
             } else {
-                room.setCreator(room.getPlayers().iterator().next());
+                room.setHost(room.getPlayers().iterator().next());
             }
         }
 
@@ -149,13 +149,13 @@ public class RoomService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (!room.getCreator().equals(user)) {
+        if (!room.getHost().equals(user)) {
             throw new IllegalStateException("Only the room creator can delete the room");
         }
 
         // 방 삭제 전 방에 잇는 모든 유저 삭제
         room.getPlayers().clear();
-        room.setCurrentPlayers(0);
+        room.setPlayersCount(0);
 
         roomRepository.delete(room);
     }
@@ -172,12 +172,12 @@ public class RoomService {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found"));
 
-        if (room.getCurrentPlayers() != room.getMaxPlayers()) {
+        if (room.getPlayersCount() != room.getMaxPlayers()) {
             throw new IllegalStateException("Cannot start game: room is not full");
         }
 
         room.setGameStarted(true);
-        room.setCreatorColor();
+        room.setIsHostWhitePlayer();
 
         Room updatedRoom = roomRepository.save(room);
         return updatedRoom.toDTO();

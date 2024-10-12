@@ -51,9 +51,9 @@ public class RoomControllerTest {
         testRoom = new RoomDTO();
         testRoom.setId(1L);
         testRoom.setTitle("Test Room");
-        testRoom.setCreatorId(1L);
-        testRoom.setCreatorUsername("testUser");
-        testRoom.setCurrentPlayers(1);
+        testRoom.setHostId(1L);
+        testRoom.setHostUsername("testUser");
+        testRoom.setPlayersCount(1);
         testRoom.setMaxPlayers(2);
     }
 
@@ -67,7 +67,7 @@ public class RoomControllerTest {
     void createRoom_ShouldCreateRoom() throws Exception {
         CreateRoomRequest request = new CreateRoomRequest();
         request.setTitle("Test Room");
-        request.setCreatorId(1L);
+        request.setHostId(1L);
 
         when(roomService.createRoom(any(), anyLong())).thenReturn(testRoom);
 
@@ -78,9 +78,9 @@ public class RoomControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(testRoom.getId()))
                 .andExpect(jsonPath("$.title").value(testRoom.getTitle()))
-                .andExpect(jsonPath("$.creatorId").value(testRoom.getCreatorId()))
-                .andExpect(jsonPath("$.creatorUsername").value(testRoom.getCreatorUsername()))
-                .andExpect(jsonPath("$.currentPlayers").value(testRoom.getCurrentPlayers()))
+                .andExpect(jsonPath("$.creatorId").value(testRoom.getHostId()))
+                .andExpect(jsonPath("$.creatorUsername").value(testRoom.getHostUsername()))
+                .andExpect(jsonPath("$.currentPlayers").value(testRoom.getPlayersCount()))
                 .andExpect(jsonPath("$.maxPlayers").value(testRoom.getMaxPlayers()));
     }
 
@@ -94,7 +94,7 @@ public class RoomControllerTest {
     void createRoom_ShouldValidateInput() throws Exception {
         CreateRoomRequest request = new CreateRoomRequest();
         request.setTitle("Te");
-        request.setCreatorId(null);
+        request.setHostId(null);
 
         mockMvc.perform(post("/api/rooms/create")
                         .with(csrf())
@@ -115,7 +115,7 @@ public class RoomControllerTest {
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUserId(2L);
 
-        testRoom.setCurrentPlayers(2);
+        testRoom.setPlayersCount(2);
 
         when(roomService.joinRoom(anyLong(), anyLong())).thenReturn(testRoom);
 
@@ -126,7 +126,7 @@ public class RoomControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(testRoom.getId()))
                 .andExpect(jsonPath("$.title").value(testRoom.getTitle()))
-                .andExpect(jsonPath("$.currentPlayers").value(testRoom.getCurrentPlayers()))
+                .andExpect(jsonPath("$.currentPlayers").value(testRoom.getPlayersCount()))
                 .andExpect(jsonPath("$.maxPlayers").value(testRoom.getMaxPlayers()));
     }
 
@@ -160,9 +160,9 @@ public class RoomControllerTest {
         RoomDTO room2 = new RoomDTO();
         room2.setId(2L);
         room2.setTitle("Room 2");
-        room2.setCreatorId(2L);
-        room2.setCreatorUsername("testUser2");
-        room2.setCurrentPlayers(1);
+        room2.setHostId(2L);
+        room2.setHostUsername("testUser2");
+        room2.setPlayersCount(1);
         room2.setMaxPlayers(2);
 
         when(roomService.getAvailableRooms()).thenReturn(Arrays.asList(testRoom, room2));
@@ -173,10 +173,10 @@ public class RoomControllerTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").value(testRoom.getId()))
                 .andExpect(jsonPath("$[0].title").value(testRoom.getTitle()))
-                .andExpect(jsonPath("$[0].creatorUsername").value(testRoom.getCreatorUsername()))
+                .andExpect(jsonPath("$[0].creatorUsername").value(testRoom.getHostUsername()))
                 .andExpect(jsonPath("$[1].id").value(room2.getId()))
                 .andExpect(jsonPath("$[1].title").value(room2.getTitle()))
-                .andExpect(jsonPath("$[1].creatorUsername").value(room2.getCreatorUsername()));
+                .andExpect(jsonPath("$[1].creatorUsername").value(room2.getHostUsername()));
     }
 
     /**

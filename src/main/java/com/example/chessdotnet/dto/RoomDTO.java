@@ -16,13 +16,13 @@ public class RoomDTO {
     private String title;
 
     /** 방 생성자의 ID */
-    private Long creatorId;
+    private Long hostId;
 
     /** 방 생성자의 이름 */
-    private String creatorUsername;
+    private String hostUsername;
 
     /** 현재 방에 참여 중인 플레이어 수 */
-    private int currentPlayers;
+    private int playersCount;
 
     /** 방의 최대 플레이어 수 */
     private int maxPlayers;
@@ -34,5 +34,5 @@ public class RoomDTO {
      * 방장의 체스 기물 색상
      * true: 백, false: 흑, null: 아직 게임 시작 전
      */
-    private Boolean creatorColor;
+    private Boolean isHostWhitePlayer;
 }

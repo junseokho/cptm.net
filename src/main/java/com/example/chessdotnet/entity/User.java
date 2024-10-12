@@ -1,7 +1,6 @@
 package com.example.chessdotnet.entity;
 
 import com.example.chessdotnet.dto.UserDTO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +28,7 @@ public class User {
     private String username; // 사용자 이름, 고유해야 함
 
     /** 사용자가 생성한 방 목록 */
-    @OneToMany(mappedBy = "creator") // 일대다 관계, Room 엔티티의 creator 필드에 매핑
+    @OneToMany(mappedBy = "host") // 일대다 관계, Room 엔티티의 host 필드에 매핑
     private List<Room> createdRooms; // 사용자가 생성한 방 목록
 
     /** 사용자가 참여한 방 목록 */

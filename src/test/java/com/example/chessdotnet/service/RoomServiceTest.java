@@ -69,8 +69,8 @@ public class RoomServiceTest {
         // Then
         assertNotNull(roomDTO);
         assertEquals("Test Room", roomDTO.getTitle());
-        assertEquals(1L, roomDTO.getCreatorId());
-        assertEquals("testUser", roomDTO.getCreatorUsername());
+        assertEquals(1L, roomDTO.getHostId());
+        assertEquals("testUser", roomDTO.getHostUsername());
         verify(roomRepository).save(any(Room.class));
     }
 
@@ -102,8 +102,8 @@ public class RoomServiceTest {
         room.setId(1L);
         room.setTitle("Test Room");
         room.setMaxPlayers(2);
-        room.setCurrentPlayers(1);
-        room.setCreator(creator);
+        room.setPlayersCount(1);
+        room.setHost(creator);
 
         User joiningUser = new User();
         joiningUser.setId(2L);
@@ -118,9 +118,9 @@ public class RoomServiceTest {
 
         // Then
         assertNotNull(updatedRoomDTO);
-        assertEquals(2, updatedRoomDTO.getCurrentPlayers());
-        assertEquals(1L, updatedRoomDTO.getCreatorId());
-        assertEquals("creatorUser", updatedRoomDTO.getCreatorUsername());
+        assertEquals(2, updatedRoomDTO.getPlayersCount());
+        assertEquals(1L, updatedRoomDTO.getHostId());
+        assertEquals("creatorUser", updatedRoomDTO.getHostUsername());
         verify(roomRepository).save(any(Room.class));
     }
 
@@ -155,12 +155,12 @@ public class RoomServiceTest {
         Room room1 = new Room();
         room1.setId(1L);
         room1.setTitle("Room 1");
-        room1.setCreator(user1);
+        room1.setHost(user1);
 
         Room room2 = new Room();
         room2.setId(2L);
         room2.setTitle("Room 2");
-        room2.setCreator(user2);
+        room2.setHost(user2);
 
         when(roomRepository.findByIsGameStartedFalse()).thenReturn(Arrays.asList(room1, room2));
 
@@ -170,9 +170,9 @@ public class RoomServiceTest {
         // Then
         assertEquals(2, availableRooms.size());
         assertEquals("Room 1", availableRooms.get(0).getTitle());
-        assertEquals("user1", availableRooms.get(0).getCreatorUsername());
+        assertEquals("user1", availableRooms.get(0).getHostUsername());
         assertEquals("Room 2", availableRooms.get(1).getTitle());
-        assertEquals("user2", availableRooms.get(1).getCreatorUsername());
+        assertEquals("user2", availableRooms.get(1).getHostUsername());
         verify(roomRepository).findByIsGameStartedFalse();
     }
 }

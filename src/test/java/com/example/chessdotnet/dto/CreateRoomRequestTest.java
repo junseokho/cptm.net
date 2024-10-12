@@ -35,7 +35,7 @@ public class CreateRoomRequestTest {
     public void validCreateRoomRequest_ShouldPassValidation() {
         CreateRoomRequest request = new CreateRoomRequest();
         request.setTitle("Valid Title");
-        request.setCreatorId(1L);
+        request.setHostId(1L);
 
         var violations = validator.validate(request);
         assertTrue(violations.isEmpty(), "유효한 요청은 검증을 통과해야 합니다.");
@@ -51,7 +51,7 @@ public class CreateRoomRequestTest {
     public void createRoomRequestWithInvalidTitle_ShouldFailValidation(String title) {
         CreateRoomRequest request = new CreateRoomRequest();
         request.setTitle(title);
-        request.setCreatorId(1L);
+        request.setHostId(1L);
 
         var violations = validator.validate(request);
         assertFalse(violations.isEmpty(), "무효한 제목은 검증에 실패해야 합니다.");
@@ -66,7 +66,7 @@ public class CreateRoomRequestTest {
     public void createRoomRequestWithNullCreatorId_ShouldFailValidation() {
         CreateRoomRequest request = new CreateRoomRequest();
         request.setTitle("Valid Title");
-        request.setCreatorId(null);
+        request.setHostId(null);
 
         var violations = validator.validate(request);
         assertFalse(violations.isEmpty(), "null creatorId는 검증에 실패해야 합니다.");

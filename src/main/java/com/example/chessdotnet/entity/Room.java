@@ -36,11 +36,11 @@ public class Room {
      * null일 경우 아직 게임이 시작되지 않았음을 의미합니다.
      */
     @Column(nullable = true)
-    private Boolean creatorColor;
+    private Boolean isHostWhitePlayer;
 
     /** 현재 방에 참여한 플레이어 수, 기본값은 1 (방장) */
     @Column(nullable = false)
-    private int currentPlayers = 1; // 현재 플레이어 수, 기본값 1
+    private int playersCount = 1; // 현재 플레이어 수, 기본값 1
 
     /**
      * 게임 준비 상태
@@ -51,8 +51,8 @@ public class Room {
 
     /** 방을 생성한 사용자 */
     @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계, 지연 로딩
-    @JoinColumn(name = "creator_id", nullable = false)
-    private User creator; // 방 생성자
+    @JoinColumn(name = "host_id", nullable = false)
+    private User host; // 방 생성자
 
     /** 방에 참여한 플레이어들 */
     @ManyToMany(fetch = FetchType.LAZY) // 다대다 관계, 지연 로딩
@@ -66,9 +66,9 @@ public class Room {
     /**
      * 방 ID에 따라 방장의 체스 기물 색상을 설정합니다.
      */
-    public void setCreatorColor() {
+    public void setIsHostWhitePlayer() {
         if (this.id != null) {
-            this.creatorColor = this.id % 2 == 0;
+            this.isHostWhitePlayer = this.id % 2 == 0;
         }
     }
 
@@ -81,12 +81,12 @@ public class Room {
         RoomDTO dto = new RoomDTO();
         dto.setId(this.id);
         dto.setTitle(this.title);
-        dto.setCreatorId(this.creator.getId());
-        dto.setCreatorUsername(this.creator.getUsername());
-        dto.setCurrentPlayers(this.currentPlayers);
+        dto.setHostId(this.host.getId());
+        dto.setHostUsername(this.host.getUsername());
+        dto.setPlayersCount(this.playersCount);
         dto.setMaxPlayers(this.maxPlayers);
         dto.setGameStarted(this.isGameStarted);
-        dto.setCreatorColor(this.creatorColor);
+        dto.setIsHostWhitePlayer(this.isHostWhitePlayer);
         return dto;
     }
 }
