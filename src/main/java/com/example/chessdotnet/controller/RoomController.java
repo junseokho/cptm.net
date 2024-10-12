@@ -107,6 +107,21 @@ public class RoomController {
     }
 
     /**
+     * 게임을 시작하고 체스 기물 색상을 설정합니다.
+     *
+     * @param roomId 게임을 시작할 방의 ID
+     * @return 업데이트된 방 정보
+     */
+    @PostMapping("/{roomId}/start")
+    public ResponseEntity<RoomDTO> startGame(@PathVariable Long roomId) {
+        log.info("게임 시작 요청. 방 ID: {}", roomId);
+        RoomDTO room = roomService.startGame(roomId);
+        log.info("게임 시작 완료. 방 ID: {}, 방장 색상: {}", roomId,
+                room.getCreatorColor() != null ? (room.getCreatorColor() ? "백" : "흑") : "미정");
+        return ResponseEntity.ok(room);
+    }
+
+    /**
      * UserNotInRoomException 발생 시 처리합니다.
      *
      * @param ex 발생한 예외

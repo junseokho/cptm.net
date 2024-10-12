@@ -29,4 +29,10 @@ public class RoomDTO {
 
     /** 게임 시작 여부 */
     private boolean isGameStarted;
+
+    /**
+     * 방장의 체스 기물 색상
+     * true: 백, false: 흑, null: 아직 게임 시작 전
+     */
+    private Boolean creatorColor;
 }

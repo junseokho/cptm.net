@@ -159,4 +159,27 @@ public class RoomService {
 
         roomRepository.delete(room);
     }
+
+    /**
+     * 게임을 시작하고 방장의 체스 기물 색상을 설정합니다.
+     *
+     * @param roomId 게임을 시작할 방의 ID
+     * @return 업데이트된 Room의 DTO
+     * @throws RoomNotFoundException 방을 찾을 수 없을 때 발생
+     */
+    @Transactional
+    public RoomDTO startGame(Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found"));
+
+        if (room.getCurrentPlayers() != room.getMaxPlayers()) {
+            throw new IllegalStateException("Cannot start game: room is not full");
+        }
+
+        room.setGameStarted(true);
+        room.setCreatorColor();
+
+        Room updatedRoom = roomRepository.save(room);
+        return updatedRoom.toDTO();
+    }
 }
