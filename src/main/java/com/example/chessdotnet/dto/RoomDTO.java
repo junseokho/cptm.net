@@ -31,8 +31,7 @@ public class RoomDTO {
     private boolean isGameStarted;
 
     /**
-     * 방장의 체스 기물 색상
-     * true: 백, false: 흑, null: 아직 게임 시작 전
+     * 방장이 first move 인지
      */
     private Boolean isHostWhitePlayer;
 }
