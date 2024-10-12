@@ -60,16 +60,16 @@ public class CreateRoomRequestTest {
     }
 
     /**
-     * creatorId가 null인 CreateRoomRequest 객체에 대한 검증을 테스트합니다.
+     * hostId가 null인 CreateRoomRequest 객체에 대한 검증을 테스트합니다.
      */
     @Test
-    public void createRoomRequestWithNullCreatorId_ShouldFailValidation() {
+    public void createRoomRequestWithNullHostId_ShouldFailValidation() {
         CreateRoomRequest request = new CreateRoomRequest();
         request.setTitle("Valid Title");
         request.setHostId(null);
 
         var violations = validator.validate(request);
-        assertFalse(violations.isEmpty(), "null creatorId는 검증에 실패해야 합니다.");
+        assertFalse(violations.isEmpty(), "null hostId는 검증에 실패해야 합니다.");
         assertEquals(1, violations.size(), "하나의 위반 사항만 있어야 합니다.");
         assertEquals("방장 ID는 필수입니다", violations.iterator().next().getMessage(),
                 "올바른 오류 메시지가 반환되어야 합니다.");
