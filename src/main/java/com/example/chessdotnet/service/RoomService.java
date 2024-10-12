@@ -150,7 +150,7 @@ public class RoomService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (!room.getHost().equals(user)) {
-            throw new IllegalStateException("Only the room creator can delete the room");
+            throw new IllegalStateException("Only the host can delete the room");
         }
 
         // 방 삭제 전 방에 잇는 모든 유저 삭제
