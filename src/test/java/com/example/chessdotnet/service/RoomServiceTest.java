@@ -94,16 +94,16 @@ public class RoomServiceTest {
     @Test
     void joinRoom_ShouldAddUserToRoom() {
         // Given
-        User creator = new User();
-        creator.setId(1L);
-        creator.setUsername("creatorUser");
+        User host = new User();
+        host.setId(1L);
+        host.setUsername("hostUser");
 
         Room room = new Room();
         room.setId(1L);
         room.setTitle("Test Room");
         room.setMaxPlayers(2);
         room.setPlayersCount(1);
-        room.setHost(creator);
+        room.setHost(host);
 
         User joiningUser = new User();
         joiningUser.setId(2L);
@@ -120,7 +120,7 @@ public class RoomServiceTest {
         assertNotNull(updatedRoomDTO);
         assertEquals(2, updatedRoomDTO.getPlayersCount());
         assertEquals(1L, updatedRoomDTO.getHostId());
-        assertEquals("creatorUser", updatedRoomDTO.getHostUsername());
+        assertEquals("hostUser", updatedRoomDTO.getHostUsername());
         verify(roomRepository).save(any(Room.class));
     }
 
