@@ -11,15 +11,16 @@ import { MatchAPI } from '../apis/MatchAPI.js'
 
 /**
  * @constructor
+ * @author 손의현(SONY_STRING)
  * @description 방 목록에서 각 방의 card 입니다. {@link MatchList}에서 사용됩니다.
  * @param {string} match_title 방 제목
  * @param {number} host_rating 방 생성자의 레이팅
- * @param {number[2]} time_control 대국의 타임 컨트롤 설정
+ * @param {Array<number>} time_control 대국의 타임 컨트롤 설정
  * @param {number} match_id 대국의 id
  * @return {JSX.Element} 방 Card 컴포넌트
  * @see MatchList
  *
- * todo user_id 를 최상위 컴포넌트에서 내려받을 좋은 방법 찾는중
+ * @todo user_id 를 최상위 컴포넌트에서 내려받을 좋은 방법 찾는중
  */
 function MatchListCard(match_title, host_rating, time_control, match_id) {
     return (
@@ -38,6 +39,7 @@ function MatchListCard(match_title, host_rating, time_control, match_id) {
 
 /**
  * @constructor
+ * @author 손의현(SONY_STRING)
  * @description 방 목록 컴포넌트입니다. {@link Lobby}에서 사용됩니다.
  * @returns {JSX.Element} 방 목록 컴포넌트
  * @see Lobby
@@ -86,10 +88,11 @@ function MatchList() {
 
 /**
  * @constructor
+ * @author 손의현(SONY_STRING)
  * @description 로비 컴포넌트입니다.
  * @returns {JSX.Element}
  */
-export default function Lobby() {
+function Lobby() {
     return (
         <>
             <div className='lobby'>
@@ -98,3 +101,5 @@ export default function Lobby() {
         </>
     )
 }
+
+export default Lobby;
