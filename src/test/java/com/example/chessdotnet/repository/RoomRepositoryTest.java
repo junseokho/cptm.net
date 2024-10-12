@@ -49,7 +49,7 @@ public class RoomRepositoryTest {
         Room room = new Room();
         room.setTitle(title);
         room.setGameStarted(isGameStarted);
-        room.setCreator(testUser);
+        room.setHost(testUser);
         return entityManager.persist(room);
     }
 

@@ -4,13 +4,11 @@ import com.example.chessdotnet.dto.CreateRoomRequest;
 import com.example.chessdotnet.dto.JoinRoomRequest;
 import com.example.chessdotnet.dto.LeaveRoomRequest;
 import com.example.chessdotnet.dto.RoomDTO;
-import com.example.chessdotnet.entity.Room;
 import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
 import com.example.chessdotnet.exception.UserNotInRoomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +39,8 @@ public class RoomController {
     @PostMapping("/create")
     public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody CreateRoomRequest request) {
         log.info("방 생성 요청: {}", request.getTitle());
-        RoomDTO room = roomService.createRoom(request.getTitle(), request.getCreatorId());        log.info("방 생성 완료. 방 ID: {}", room.getId());
+        RoomDTO room = roomService.createRoom(request.getTitle(), request.getHostId());
+        log.info("방 생성 완료. 방 ID: {}", room.getId());
         return ResponseEntity.ok(room);
     }
 
@@ -55,7 +54,8 @@ public class RoomController {
     @PostMapping("/{roomId}/join")
     public ResponseEntity<RoomDTO> joinRoom(@PathVariable Long roomId, @Valid @RequestBody JoinRoomRequest request) {
         log.info("방 참여 요청. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
-        RoomDTO room = roomService.joinRoom(roomId, request.getUserId());        log.info("방 참여 완료. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
+        RoomDTO room = roomService.joinRoom(roomId, request.getUserId());
+        log.info("방 참여 완료. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
         return ResponseEntity.ok(room);
     }
 
@@ -104,6 +104,20 @@ public class RoomController {
         roomService.deleteRoom(roomId, userId);
         log.info("방 삭제 완료. 방 ID: {}", roomId);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 게임을 시작하고 체스 기물 색상을 설정합니다.
+     *
+     * @param roomId 게임을 시작할 방의 ID
+     * @return 업데이트된 방 정보
+     */
+    @PostMapping("/{roomId}/start")
+    public ResponseEntity<RoomDTO> startGame(@PathVariable Long roomId) {
+        log.info("게임 시작 요청. 방 ID: {}", roomId);
+        RoomDTO room = roomService.startGame(roomId);
+        log.info("게임 시작 완료. 방 ID: {}, 방장 색상: {}", roomId, room.getIsHostWhitePlayer() ? "백" : "흑");
+        return ResponseEntity.ok(room);
     }
 
     /**

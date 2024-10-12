@@ -19,17 +19,17 @@ public class RoomDTOTest {
 
         roomDTO.setId(1L);
         roomDTO.setTitle("Test Room");
-        roomDTO.setCreatorId(2L);
-        roomDTO.setCreatorUsername("testUser");
-        roomDTO.setCurrentPlayers(1);
+        roomDTO.setHostId(2L);
+        roomDTO.setHostUsername("testUser");
+        roomDTO.setPlayersCount(1);
         roomDTO.setMaxPlayers(2);
         roomDTO.setGameStarted(false);
 
         assertEquals(1L, roomDTO.getId(), "ID가 올바르게 설정되어야 합니다.");
         assertEquals("Test Room", roomDTO.getTitle(), "제목이 올바르게 설정되어야 합니다.");
-        assertEquals(2L, roomDTO.getCreatorId(), "생성자 ID가 올바르게 설정되어야 합니다.");
-        assertEquals("testUser", roomDTO.getCreatorUsername(), "생성자 이름이 올바르게 설정되어야 합니다.");
-        assertEquals(1, roomDTO.getCurrentPlayers(), "현재 플레이어 수가 올바르게 설정되어야 합니다.");
+        assertEquals(2L, roomDTO.getHostId(), "생성자 ID가 올바르게 설정되어야 합니다.");
+        assertEquals("testUser", roomDTO.getHostUsername(), "생성자 이름이 올바르게 설정되어야 합니다.");
+        assertEquals(1, roomDTO.getPlayersCount(), "현재 플레이어 수가 올바르게 설정되어야 합니다.");
         assertEquals(2, roomDTO.getMaxPlayers(), "최대 플레이어 수가 올바르게 설정되어야 합니다.");
         assertFalse(roomDTO.isGameStarted(), "게임 시작 상태가 올바르게 설정되어야 합니다.");
     }

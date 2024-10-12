@@ -24,5 +24,5 @@ public class CreateRoomRequest {
      * 이 필드는 null이 될 수 없습니다.
      */
     @NotNull(message = "방장 ID는 필수입니다")
-    private Long creatorId; // 방 생성자 ID
+    private Long hostId; // 방 생성자 ID
 }
