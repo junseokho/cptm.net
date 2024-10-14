@@ -2,11 +2,12 @@
  * @author 손의현(SONY_STRING)
  * @description 대국 로비와 관련된 컴포넌트들 입니다.
  *
- * todo css 안만들었음
+ * todo css 미완성
  */
 
 import { useState } from 'react'
 import { MatchAPI } from '../apis/MatchAPI.js'
+import '../assets/css/lobby.scss'
 
 
 /**
@@ -102,4 +103,21 @@ function Lobby() {
     )
 }
 
-export default Lobby;
+function MenuRight() {
+    // 메뉴 레이아웃 재설계 필요해보임
+    // user 정보를 잘 공유할 방법 필요함
+    // Create a Game 을 누르면
+    return (
+        <>
+            <div className="menu">
+                <p onClick={
+                    () => MatchAPI.create_new_match("host name", "1")
+                }>
+                    Create a Game
+                </p>
+            </div>
+        </>
+    )
+}
+
+export { Lobby, MenuRight };
