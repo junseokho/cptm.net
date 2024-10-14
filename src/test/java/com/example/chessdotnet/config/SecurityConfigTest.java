@@ -52,7 +52,7 @@ public class SecurityConfigTest {
     public void givenAuthenticatedUser_whenAccessingProtectedEndpoint_thenShouldBeAllowed() throws Exception {
         CreateRoomRequest request = new CreateRoomRequest();
         request.setTitle("Test Room");
-        request.setCreatorId(1L);
+        request.setHostId(1L);
 
         mockMvc.perform(post("/api/rooms/create")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +81,7 @@ public class SecurityConfigTest {
     public void givenAuthenticatedUser_whenPostingWithoutCsrfToken_thenShouldBeAllowed() throws Exception {
         CreateRoomRequest request = new CreateRoomRequest();
         request.setTitle("Test Room");
-        request.setCreatorId(1L);
+        request.setHostId(1L);
 
         mockMvc.perform(post("/api/rooms/create")
                         .contentType(MediaType.APPLICATION_JSON)

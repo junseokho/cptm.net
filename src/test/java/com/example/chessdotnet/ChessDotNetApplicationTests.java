@@ -92,15 +92,15 @@ class ChessDotNetIntegrationTest {
         long initialCount = roomRepository.count();
 
         // 먼저 User 생성
-        User creator = new User();
-        creator.setUsername("roomCreator" + System.currentTimeMillis());
-        creator = userRepository.save(creator);
+        User host = new User();
+        host.setUsername("roomHost" + System.currentTimeMillis());
+        host = userRepository.save(host);
 
         // 새 방 생성
         Room newRoom = new Room();
         newRoom.setTitle("Test Room");
-        newRoom.setCreator(creator);
-        newRoom.setCurrentPlayers(1);
+        newRoom.setHost(host);
+        newRoom.setPlayersCount(1);
         newRoom.setMaxPlayers(2);
         newRoom.setGameStarted(false);
         Room savedRoom = roomRepository.save(newRoom);

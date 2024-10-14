@@ -31,18 +31,28 @@ public class Room {
     @Column(nullable = false)
     private int maxPlayers = 2; // 최대 플레이어 수, 기본값 2
 
+    /**
+     * 방장의 체스 기물 색상 (true: 백, false: 흑)
+     * null일 경우 아직 게임이 시작되지 않았음을 의미합니다.
+     */
+    @Column(nullable = true)
+    private Boolean isHostWhitePlayer;
+
     /** 현재 방에 참여한 플레이어 수, 기본값은 1 (방장) */
     @Column(nullable = false)
-    private int currentPlayers = 1; // 현재 플레이어 수, 기본값 1
+    private int playersCount = 1; // 현재 플레이어 수, 기본값 1
 
-    /** 게임 시작 여부 */
+    /**
+     * 게임 준비 상태
+     * true일 경우 게임을 시작할 수 있는 상태입니다.
+     */
     @Column(nullable = false)
     private boolean isGameStarted = false; // 게임 시작 여부
 
     /** 방을 생성한 사용자 */
     @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계, 지연 로딩
-    @JoinColumn(name = "creator_id", nullable = false)
-    private User creator; // 방 생성자
+    @JoinColumn(name = "host_id", nullable = false)
+    private User host; // 방 생성자
 
     /** 방에 참여한 플레이어들 */
     @ManyToMany(fetch = FetchType.LAZY) // 다대다 관계, 지연 로딩
@@ -54,6 +64,15 @@ public class Room {
     private Set<User> players = new HashSet<>(); // 방에 참여한 플레이어들
 
     /**
+     * 방 ID에 따라 방장의 체스 기물 색상을 설정합니다.
+     */
+    public void setIsHostWhitePlayer() {
+        if (this.id != null) {
+            this.isHostWhitePlayer = this.id % 2 == 0;
+        }
+    }
+
+    /**
      * Room 엔티티를 RoomDTO로 변환합니다.
      *
      * @return 변환된 RoomDTO 객체
@@ -62,11 +81,12 @@ public class Room {
         RoomDTO dto = new RoomDTO();
         dto.setId(this.id);
         dto.setTitle(this.title);
-        dto.setCreatorId(this.creator.getId());
-        dto.setCreatorUsername(this.creator.getUsername());
-        dto.setCurrentPlayers(this.currentPlayers);
+        dto.setHostId(this.host.getId());
+        dto.setHostUsername(this.host.getUsername());
+        dto.setPlayersCount(this.playersCount);
         dto.setMaxPlayers(this.maxPlayers);
         dto.setGameStarted(this.isGameStarted);
+        dto.setIsHostWhitePlayer(this.isHostWhitePlayer);
         return dto;
     }
 }

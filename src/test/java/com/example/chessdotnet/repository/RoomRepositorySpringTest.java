@@ -51,9 +51,9 @@ class RoomRepositorySpringTest {
         Room room = new Room();
         room.setTitle(title);
         room.setGameStarted(isGameStarted);
-        room.setCreator(testUser);
+        room.setHost(testUser);
         room.setMaxPlayers(maxPlayers);
-        room.setCurrentPlayers(currentPlayers);
+        room.setPlayersCount(currentPlayers);
         return entityManager.persist(room);
     }
 

@@ -16,17 +16,22 @@ public class RoomDTO {
     private String title;
 
     /** 방 생성자의 ID */
-    private Long creatorId;
+    private Long hostId;
 
     /** 방 생성자의 이름 */
-    private String creatorUsername;
+    private String hostUsername;
 
     /** 현재 방에 참여 중인 플레이어 수 */
-    private int currentPlayers;
+    private int playersCount;
 
     /** 방의 최대 플레이어 수 */
     private int maxPlayers;
 
     /** 게임 시작 여부 */
     private boolean isGameStarted;
+
+    /**
+     * 방장이 first move 인지
+     */
+    private Boolean isHostWhitePlayer;
 }
