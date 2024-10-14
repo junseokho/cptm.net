@@ -40,7 +40,7 @@ class MatchAPI {
             `/api/rooms/create`,
             {
                 title: match_title,
-                creatorId: match_creator_id
+                hostId: match_creator_id
             },
         );
     }
