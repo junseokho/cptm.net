@@ -28,6 +28,9 @@ public class RoomService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private WebSocketService webSocketService;
+
     /**
      * 새로운 방을 생성합니다.
      *
@@ -161,11 +164,12 @@ public class RoomService {
     }
 
     /**
-     * 게임을 시작하고 방장의 체스 기물 색상을 설정합니다.
+     * 게임을 시작하고 WebSocket을 통해 알림을 전송합니다.
      *
      * @param roomId 게임을 시작할 방의 ID
      * @return 업데이트된 Room의 DTO
      * @throws RoomNotFoundException 방을 찾을 수 없을 때 발생
+     * @throws IllegalStateException 방이 가득 차지 않았을 때 발생
      */
     @Transactional
     public RoomDTO startGame(Long roomId) {
@@ -180,6 +184,10 @@ public class RoomService {
         room.setIsHostWhitePlayer();
 
         Room updatedRoom = roomRepository.save(room);
+
+        // WebSocket을 통해 게임 시작 알림 전송
+        webSocketService.notifyGameStarted(roomId);
+
         return updatedRoom.toDTO();
     }
 }
