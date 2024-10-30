@@ -25,4 +25,5 @@ public class CreateRoomRequest {
      */
     @NotNull(message = "방장 ID는 필수입니다")
     private Long hostId; // 방 생성자 ID
+
 }
