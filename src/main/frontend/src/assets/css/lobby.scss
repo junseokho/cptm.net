@@ -37,8 +37,38 @@
     }
 
     td {
-      border-bottom: 1px solid rgba(0,0,0,.5);
+      border-bottom: 1px solid #555555;
       color: #a3a3a3;
     }
+  }
+}
+
+.body-center {
+  float: left;
+  width: 70%;
+  margin-left: 10%;
+  margin-right: 5%;
+}
+
+.body-right {
+  float: left;
+  width: 15%;
+  height: 80%;
+  .menu {
+    transition: 250ms;
+    border-radius: 10px;
+    padding-left: 2%;
+    margin-top: 15%;
+    margin-bottom: 15%;
+    padding: 5%;
+    width: auto;
+    background: #2e2e2e;
+    p {
+      color: #a3a3a3;
+    }
+  }
+  .menu:hover {
+    background-color: #424242;
+    cursor: pointer;
   }
 }

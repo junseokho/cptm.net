@@ -5,9 +5,9 @@
  */
 
 import '../assets/css/main_layout.scss'
-import {Lobby, MenuRight} from "../components/Lobby.jsx";
+import Lobby from "../components/Lobby.jsx";
 
-function Layout() {
+function Main() {
     // todo menu:n is test
     return (
         <div className="empty">
@@ -46,15 +46,12 @@ function Layout() {
                         <p>menu7</p>
                     </div>
                 </div>
-                <div className="body-center">
+                <div className="body-main">
                     <Lobby/>
-                </div>
-                <div className="body-right">
-                    <MenuRight/>
                 </div>
             </div>
         </div>
     )
 }
 
-export default Layout;
+export default Main;

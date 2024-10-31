@@ -81,17 +81,39 @@ function MatchList() {
         />
     ));
     return (
+        <div className='lobby'>
+                <table className='hooks-list'>
+                    <thead>
+                        <tr>
+                            <th>title</th><th>rating</th><th>time control</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {match_cards}
+                    </tbody>
+                </table>
+        </div>
+    )
+}
+
+
+/**
+ * @constructor
+ * @author 손의현(SONY_STRING)
+ * @description 로비의 우측 메뉴 입니다.
+ * @returns {JSX.Element}
+ */
+function MenuRight() {
+    // todo Create a Game
+    return (
         <>
-            <table className='hooks-list'>
-                <thead>
-                    <tr>
-                        <th>title</th><th>rating</th><th>time control</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {match_cards}
-                </tbody>
-            </table>
+            <div className="menu">
+                <p onClick={
+                    () => MatchAPI.create_new_match("host name", "1")
+                }>
+                    Create a Game
+                </p>
+            </div>
         </>
     )
 }
@@ -106,28 +128,15 @@ function MatchList() {
 function Lobby() {
     return (
         <>
-            <div className='lobby'>
+            <div className='body-center'>
                     <MatchList/>
             </div>
-        </>
-    )
-}
-
-function MenuRight() {
-    // 메뉴 레이아웃 재설계 필요해보임
-    // user 정보를 잘 공유할 방법 필요함
-    // Create a Game 을 누르면
-    return (
-        <>
-            <div className="menu">
-                <p onClick={
-                    () => MatchAPI.create_new_match("host name", "1")
-                }>
-                    Create a Game
-                </p>
+            <div className='body-right'>
+                <MenuRight/>
             </div>
         </>
     )
 }
 
-export { Lobby, MenuRight };
+
+export default Lobby;
