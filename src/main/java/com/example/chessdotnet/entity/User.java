@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,11 +31,11 @@ public class User {
 
     /** 사용자가 생성한 방 목록 */
     @OneToMany(mappedBy = "host") // 일대다 관계, Room 엔티티의 host 필드에 매핑
-    private List<Room> createdRooms; // 사용자가 생성한 방 목록
+    private List<Room> createdRooms = new ArrayList<>(); // 필드 초기화
 
     /** 사용자가 참여한 방 목록 */
     @ManyToMany(mappedBy = "players") // 다대다 관계, Room 엔티티의 players 필드에 매핑
-    private Set<Room> joinedRooms; // 사용자가 참여한 방 목록
+    private Set<Room> joinedRooms= new HashSet<>(); // 필드 초기화
 
     /**
      * User 엔티티를 UserDTO로 변환합니다.

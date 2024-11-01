@@ -7,9 +7,9 @@ import com.example.chessdotnet.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
 /**
  * 사용자 관련 비즈니스 로직을 처리하는 서비스 클래스입니다.
+ * 이 클래스는 사용자 생성 및 조회와 관련된 메서드를 제공합니다.
  *
  * @author 전종영
  */
@@ -22,11 +22,12 @@ public class UserService {
     /**
      * 새로운 비회원 사용자를 생성합니다.
      *
+     * @param username 비회원 사용자의 이름
      * @return 생성된 사용자의 DTO
      */
-    public UserDTO createGuestUser() {
+    public UserDTO createGuestUser(String username) {
         User user = new User();
-        user.setUsername("Guest_" + System.currentTimeMillis());
+        user.setUsername(username);
         User savedUser = userRepository.save(user);
         return savedUser.toDTO();
     }
@@ -56,6 +57,4 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         return user.toDTO();
     }
-
-
 }

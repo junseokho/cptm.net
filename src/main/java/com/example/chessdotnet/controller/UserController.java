@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import javax.servlet.http.HttpSession;
 
 /**
  * 사용자 관련 HTTP 요청을 처리하는 컨트롤러 클래스입니다.
@@ -27,12 +28,13 @@ public class UserController {
      * 새로운 비회원 사용자를 생성합니다.
      * 이 메서드는 임시로 GET 요청을 통해 비회원 사용자를 생성합니다.
      *
+     * @param username 비회원 사용자의 이름
      * @return 생성된 사용자의 DTO
      */
     @GetMapping("/create-guest")
-    public ResponseEntity<UserDTO> createGuestUser() {
-        log.info("비회원 사용자 생성 요청");
-        UserDTO user = userService.createGuestUser();
+    public ResponseEntity<UserDTO> createGuestUser(@RequestParam String username) {
+        log.info("비회원 사용자 생성 요청: {}", username);
+        UserDTO user = userService.createGuestUser(username);
         log.info("비회원 사용자 생성 완료. 사용자 ID: {}", user.getId());
         return ResponseEntity.ok(user);
     }
@@ -70,4 +72,3 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 }
-
