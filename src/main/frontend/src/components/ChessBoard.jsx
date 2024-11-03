@@ -1,57 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Square from './Square.jsx';
+import utils from "../utils/utils.js";
+
+import initialChessBoard from "./initialChessBoard.js"
 import '../assets/ChessBoard.css'; // 스타일 시트 경로 확인
 
+
 /**
- * ChessBoard 컴포넌트 - 체스판과 기물을 렌더링하는 컴포넌트
+ * @description ChessBoard Component. Root Component of chessboard.
  *
- * @param {Object} props - 컴포넌트의 props
- * @param {Array} props.board - 8x8 체스판 배열, 각 칸에 기물 객체가 있거나 null
- * @param {Function} props.onPieceClick - 사용자가 기물을 클릭할 때 호출되는 함수
- * @param {Function} props.onSquareClick - 사용자가 빈 칸을 클릭할 때 호출되는 함수
- * @param {Array} props.highlightedSquares - 이동 가능한 칸을 표시하는 배열
- * @param {Object} props.selectedSquare - 선택된 칸의 위치 객체 {row: number, col: number}
- * @returns {JSX.Element} - 체스판을 렌더링하는 JSX 요소
+ * @component
+ * @returns {JSX.Element} - 체스판 로직 및 렌더링을 포함한 JSX 요소
  */
-const ChessBoard = ({ board, onPieceClick, onSquareClick, highlightedSquares, selectedSquare }) => {
+function ChessBoard() {
+    const [board] = useState(initialChessBoard);
+    const [highlightedSquares, setHighlightedSquares] = useState([]);
+    const [selectedSquare, setSelectedSquare] = useState(null);
+    const selectedPiece = selectedSquare ? board[selectedSquare.row][selectedSquare.col] : null;
+    /**
+     * @description 기물이 클릭되었을 때 호출되는 함수
+     *
+     * @param {Object} piece - 클릭된 기물 객체
+     */
+    const handlePieceClick = (piece) => {
+        setHighlightedSquares([]);
+        setSelectedSquare(null);
+
+        if (piece) {
+            const availableMoves = piece.getAvailableMoves(board);
+            utils.dlog(`Selected piece: ${piece.name} at row=${piece.position.row} col=${piece.position.col}`);
+
+            setHighlightedSquares(availableMoves);
+            setSelectedSquare(piece.position);
+        }
+    };
 
     /**
-     * 하나의 칸(square)을 렌더링하는 함수
+     * @description 기물이 없는 칸이 클릭되었을 때 호출되는 함수
      *
-     * @param {number} i - 열 인덱스 (column)
-     * @param {number} j - 행 인덱스 (row)
-     * @returns {JSX.Element} - 각 체스판 칸을 나타내는 JSX 요소
+     * @param {Object} targetPosition - 클릭된 빈 칸의 위치 {row: number, col: number}
      */
-    const renderSquare = (i, j) => {
-        const piece = board[i][j];
-        const isLightBrown = (i + j) % 2 === 1; // 칸 색상 설정 (체스판 패턴)
-        let squareClasses = isLightBrown ? 'light-brown' : 'white';
+    const handleSquareClick = (targetPosition) => {
+        if (
+            selectedPiece &&
+            highlightedSquares.some(
+                pos => pos.row === targetPosition.row && pos.col === targetPosition.col
+            )
+        ) {
+            utils.dlog(`Moving piece: ${selectedPiece.name}`);
+            utils.dlog(`From position: row=${selectedPiece.position.row}, col=${selectedPiece.position.col}`);
+            utils.dlog(`To position: row=${targetPosition.row}, col=${targetPosition.col}`);
 
-        // 강조된 칸인지 확인
-        if (highlightedSquares.some(pos => pos.row === j && pos.col === i)) {
-            squareClasses += ' highlight';
+            setHighlightedSquares([]);
+            setSelectedSquare(null);
+        } else {
+            setHighlightedSquares([]);
+            setSelectedSquare(null);
         }
-
-        // 선택된 칸인지 확인
-        if (selectedSquare && selectedSquare.row === j && selectedSquare.col === i) {
-            squareClasses += ' selected';
-        }
-
-        return (
-            <div
-                key={`${i}-${j}`}
-                className={`square ${squareClasses}`}
-                data-position={`${i}-${j}`}
-                onClick={() => {
-                    if (piece) {
-                        onPieceClick(piece, { row: j, col: i });
-                    } else {
-                        onSquareClick({ row: j, col: i });
-                    }
-                }}
-            >
-                {piece && <img src={piece.image} alt={piece.name} className="piece" />}
-            </div>
-        );
     };
 
     /**
@@ -63,7 +68,15 @@ const ChessBoard = ({ board, onPieceClick, onSquareClick, highlightedSquares, se
     const renderRow = (i) => {
         return (
             <div key={i} className="board-row">
-                {Array.from({ length: 8 }, (_, j) => renderSquare(i, j))}
+                {Array.from({ length: 8 }, (_, j) =>
+                    <Square
+                        piece={board[i][j]}
+                        position={{'row': i, 'col': j}}
+                        handleClick={board[i][j] ? handlePieceClick : handleSquareClick}
+                        isHighlighted={highlightedSquares.some(pos => pos.row === i && pos.col === j)}
+                        isSelected={selectedSquare && selectedSquare.row === i && selectedSquare.col === j}
+                    />
+                )}
             </div>
         );
     };
