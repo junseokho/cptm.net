@@ -25,6 +25,7 @@ public class RoomStatusMessage {
         PLAYER_JOINED,
         /** 플레이어가 방에서 나갔음을 나타냅니다. */
         PLAYER_LEFT,
+        GAME_ENDED,
         /** 오류가 발생했음을 나타냅니다. */
         ERROR
     }

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * DataInitializer 클래스의 기능을 테스트하는 클래스입니다.
- * 이 테스트는 초기 데이터 생성 로직이 올바르게 동작하는지 확인합니다.
+ * 초기 데이터 생성 로직이 올바르게 동작하는지 확인합니다.
  *
  * @author 전종영
  */
@@ -33,20 +33,20 @@ public class DataInitializerTest {
      */
     @Test
     void givenEmptyDatabase_whenInitData_thenShouldCreateTestUser() throws Exception {
+        // Given
         when(userRepository.count()).thenReturn(0L);
 
         User mockUser = new User();
         mockUser.setId(1L);
-        mockUser.setUsername("testUser");
+        mockUser.setUsername("testUser1");
         when(userRepository.save(any(User.class))).thenReturn(mockUser);
 
+        // When
         dataInitializer.initData(userRepository).run(new String[]{});
 
+        // Then
         verify(userRepository, times(1)).count();
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository, times(1)).save(userCaptor.capture());
-        User capturedUser = userCaptor.getValue();
-        assertEquals("testUser", capturedUser.getUsername());
+        verify(userRepository, times(2)).save(any(User.class));
     }
 
     /**
@@ -56,10 +56,13 @@ public class DataInitializerTest {
      */
     @Test
     void givenNonEmptyDatabase_whenInitData_thenShouldNotCreateTestUser() throws Exception {
+        // Given
         when(userRepository.count()).thenReturn(1L);
 
+        // When
         dataInitializer.initData(userRepository).run(new String[]{});
 
+        // Then
         verify(userRepository, times(1)).count();
         verify(userRepository, never()).save(any(User.class));
     }

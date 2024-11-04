@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Autowired;
 /**
  * 방 상태 변경을 처리하고 웹소켓을 통해 클라이언트에게 알림을 전송하는 서비스 클래스입니다.
  * 이 클래스는 실시간으로 방의 상태 변경사항을 모든 참여자에게 전파하는 역할을 합니다.
@@ -16,11 +16,15 @@ import org.springframework.stereotype.Service;
  * @since 2024-11-01
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class RoomWebSocketService {
     /** 웹소켓 메시지를 전송하기 위한 Spring 메시징 템플릿입니다. */
     private final SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    public RoomWebSocketService(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     /**
      * 방의 상태가 변경되었을 때 해당 방의 모든 참여자에게 알림을 전송합니다.
