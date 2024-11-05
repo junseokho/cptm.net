@@ -44,6 +44,8 @@ dependencies {
     testImplementation 'com.h2database:h2'  // H2 Database 추가
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     //runtimeOnly 'com.h2database:h2' // 개발/테스트용
     runtimeOnly 'mysql:mysql-connector-java:8.0.33'
