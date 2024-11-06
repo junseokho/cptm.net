@@ -1,11 +1,13 @@
 .lobby {
-  background: #323232;
+  border-radius: 15px;
+  background: #454545;
   padding: 10px;
   height: 500px;
+  overflow: scroll;
 }
 
 .hooks-list {
-  border: 1px #a39485 solid;
+  border: 1px #2e2e2e solid;
   font-size: .9em;
   width: 100%;
   border-collapse: collapse;
@@ -18,10 +20,16 @@
 
   thead {
     font-weight: bold;
-    color: #fff;
-    background: #323232;
+    color: #c6c6c6;
   }
 
+  .hook-join:hover {
+    background-color: #a35639;
+    td {
+      color: white;
+      cursor: pointer;
+    }
+  }
   .hook-join {
     td, th {
       padding: 1em .5em;
@@ -29,8 +37,38 @@
     }
 
     td {
-      border-bottom: 1px solid rgba(0,0,0,.1);
-      background: #fff;
+      border-bottom: 1px solid #555555;
+      color: #a3a3a3;
     }
+  }
+}
+
+.body-center {
+  float: left;
+  width: 70%;
+  margin-left: 10%;
+  margin-right: 5%;
+}
+
+.body-right {
+  float: left;
+  width: 15%;
+  height: 80%;
+  .menu {
+    transition: 250ms;
+    border-radius: 10px;
+    padding-left: 2%;
+    margin-top: 15%;
+    margin-bottom: 15%;
+    padding: 5%;
+    width: auto;
+    background: #2e2e2e;
+    p {
+      color: #a3a3a3;
+    }
+  }
+  .menu:hover {
+    background-color: #424242;
+    cursor: pointer;
   }
 }
