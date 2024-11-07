@@ -7,6 +7,7 @@ import com.example.chessdotnet.dto.RoomDTO;
 import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
 import com.example.chessdotnet.exception.UserNotInRoomException;
+import com.example.chessdotnet.service.ChessGameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,10 @@ import java.util.List;
 
 /**
  * 방 관련 HTTP 요청을 처리하는 컨트롤러 클래스입니다.
+ *
  * @author 전종영
+ * @version 1.2
+ * @since 2024-11-07
  */
 @RestController
 @RequestMapping("/api/rooms")
@@ -73,6 +77,25 @@ public class RoomController {
     }
 
     /**
+     * 게임을 시작하고 체스 기물을 초기 배치합니다.
+     *
+     * @param roomId 게임을 시작할 방의 ID
+     * @param initialPieces 초기 기물 배치 정보 리스트
+     * @return 업데이트된 방 정보
+     */
+    @PostMapping("/{roomId}/start")
+    public ResponseEntity<RoomDTO> startGame(
+            @PathVariable Long roomId,
+            @Valid @RequestBody List<ChessGameService.InitialPieceDTO> initialPieces) {
+        log.info("게임 시작 요청. 방 ID: {}", roomId);
+        RoomDTO room = roomService.startGame(roomId, initialPieces);
+        log.info("게임 시작 완료. 방 ID: {}, 방장 색상: {}",
+                roomId,
+                room.getIsHostWhitePlayer() ? "백" : "흑");
+        return ResponseEntity.ok(room);
+    }
+
+    /**
      * 사용자가 방을 나가는 요청을 처리합니다.
      *
      * @param roomId 나가려는 방의 ID
@@ -104,20 +127,6 @@ public class RoomController {
         roomService.deleteRoom(roomId, userId);
         log.info("방 삭제 완료. 방 ID: {}", roomId);
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * 게임을 시작하고 체스 기물 색상을 설정합니다.
-     *
-     * @param roomId 게임을 시작할 방의 ID
-     * @return 업데이트된 방 정보
-     */
-    @PostMapping("/{roomId}/start")
-    public ResponseEntity<RoomDTO> startGame(@PathVariable Long roomId) {
-        log.info("게임 시작 요청. 방 ID: {}", roomId);
-        RoomDTO room = roomService.startGame(roomId);
-        log.info("게임 시작 완료. 방 ID: {}, 방장 색상: {}", roomId, room.getIsHostWhitePlayer() ? "백" : "흑");
-        return ResponseEntity.ok(room);
     }
 
     /**
@@ -176,8 +185,7 @@ public class RoomController {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        return ResponseEntity.badRequest().body("Invalid input: " + ex.getBindingResult().getAllErrors().getFirst().getDefaultMessage());
+        return ResponseEntity.badRequest().body("Invalid input: " +
+                ex.getBindingResult().getAllErrors().getFirst().getDefaultMessage());
     }
-
-
 }

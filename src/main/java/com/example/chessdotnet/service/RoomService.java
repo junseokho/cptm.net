@@ -4,6 +4,7 @@ import com.example.chessdotnet.dto.RoomDTO;
 import com.example.chessdotnet.dto.RoomStatusMessage;
 import com.example.chessdotnet.entity.Room;
 import com.example.chessdotnet.entity.User;
+import com.example.chessdotnet.entity.ChessGame;
 import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
 import com.example.chessdotnet.exception.UserNotInRoomException;
@@ -12,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.example.chessdotnet.repository.RoomRepository;
 import com.example.chessdotnet.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -22,14 +22,17 @@ import java.util.stream.Collectors;
  * 체스 게임 방 관련 비즈니스 로직을 처리하는 서비스 클래스입니다.
  *
  * @author 전종영
+ * @version 1.2
+ * @since 2024-11-07
  */
-@Service // 비즈니스 로직을 담당하는 서비스 클래스임을 나타냄
+@Service
 @RequiredArgsConstructor
 @Slf4j
 public class RoomService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
     private final RoomWebSocketService webSocketService;
+    private final ChessGameService chessGameService;
 
     /**
      * 새로운 방을 생성합니다.
@@ -65,16 +68,13 @@ public class RoomService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        // 방이 가득 찼는지 확인
         if (room.getPlayersCount() >= room.getMaxPlayers()) {
             throw new RuntimeException("Room is full");
         }
 
-        // 사용자를 방에 추가
         room.getPlayers().add(user);
         room.setPlayersCount(room.getPlayersCount() + 1);
 
-        // 방이 가득 찼다면 게임 시작 상태로 변경
         if (room.getPlayersCount() == room.getMaxPlayers()) {
             room.setGameStarted(true);
         }
@@ -82,7 +82,6 @@ public class RoomService {
         Room updatedRoom = roomRepository.save(room);
         RoomDTO roomDTO = updatedRoom.toDTO();
 
-        // 방 상태 변경 알림
         webSocketService.notifyRoomStatusChanged(
                 roomDTO,
                 room.isGameStarted() ?
@@ -102,6 +101,50 @@ public class RoomService {
         return roomRepository.findByIsGameStartedFalse().stream()
                 .map(Room::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 게임을 시작하고 WebSocket을 통해 알림을 전송합니다.
+     *
+     * @param roomId 게임을 시작할 방의 ID
+     * @param initialPieces 초기 기물 배치 정보
+     * @return 업데이트된 Room의 DTO
+     * @throws RoomNotFoundException 방을 찾을 수 없을 때 발생
+     * @throws IllegalStateException 방이 가득 차지 않았을 때 발생
+     */
+    @Transactional
+    public RoomDTO startGame(Long roomId, List<ChessGameService.InitialPieceDTO> initialPieces) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found"));
+
+        if (!room.isGameStarted()) {
+            throw new IllegalStateException("Cannot start game: room is not ready");
+        }
+
+        if (room.getPlayersCount() != room.getMaxPlayers()) {
+            throw new IllegalStateException("Cannot start game: room is not full");
+        }
+
+        // 체스 게임 생성
+        ChessGame game = chessGameService.createGame(roomId, initialPieces);
+
+        // 체스 기물 색상 설정
+        room.setIsHostWhitePlayer();
+
+        Room updatedRoom = roomRepository.save(room);
+        RoomDTO roomDTO = updatedRoom.toDTO();
+
+        // 게임 시작 알림
+        webSocketService.notifyRoomStatusChanged(
+                roomDTO,
+                RoomStatusMessage.MessageType.GAME_STARTED
+        );
+
+        log.info("Game started in room {}, host playing as {}",
+                roomId,
+                room.getIsHostWhitePlayer() ? "white" : "black");
+
+        return roomDTO;
     }
 
     /**
@@ -128,9 +171,12 @@ public class RoomService {
         room.getPlayers().remove(user);
         room.setPlayersCount(room.getPlayersCount() - 1);
 
-        // 게임이 시작되었고 플레이어가 1명 이하가 되면 게임 종료
         if (room.isGameStarted() && room.getPlayersCount() <= 1) {
             room.setGameStarted(false);
+            webSocketService.notifyRoomStatusChanged(
+                    room.toDTO(),
+                    RoomStatusMessage.MessageType.GAME_ENDED
+            );
         }
 
         if (room.getHost().equals(user)) {
@@ -166,47 +212,11 @@ public class RoomService {
             throw new IllegalStateException("Only the host can delete the room");
         }
 
-        // 방 삭제 전 방에 잇는 모든 유저 삭제
         room.getPlayers().clear();
         room.setPlayersCount(0);
 
         roomRepository.delete(room);
-    }
 
-    /**
-     * 게임을 시작하고 WebSocket을 통해 알림을 전송합니다.
-     *
-     * @param roomId 게임을 시작할 방의 ID
-     * @return 업데이트된 Room의 DTO
-     * @throws RoomNotFoundException 방을 찾을 수 없을 때 발생
-     * @throws IllegalStateException 방이 가득 차지 않았을 때 발생
-     */
-    @Transactional
-    public RoomDTO startGame(Long roomId) {
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RoomNotFoundException("Room not found"));
-
-        // 게임 시작 조건 검증
-        if (!room.isGameStarted()) {
-            throw new IllegalStateException("Cannot start game: room is not ready");
-        }
-
-        if (room.getPlayersCount() != room.getMaxPlayers()) {
-            throw new IllegalStateException("Cannot start game: room is not full");
-        }
-
-        // 체스 기물 색상 설정
-        room.setIsHostWhitePlayer();
-
-        Room updatedRoom = roomRepository.save(room);
-        RoomDTO roomDTO = updatedRoom.toDTO();
-
-        // 게임 시작 알림
-        webSocketService.notifyRoomStatusChanged(
-                roomDTO,
-                RoomStatusMessage.MessageType.GAME_STARTED
-        );
-
-        return roomDTO;
+        log.info("Room {} deleted by user {}", roomId, userId);
     }
 }

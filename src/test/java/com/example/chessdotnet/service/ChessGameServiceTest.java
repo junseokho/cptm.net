@@ -20,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,7 +55,35 @@ public class ChessGameServiceTest {
     private Room testRoom;
 
     /**
-     * 각 테스트 실행 전에 필요한 테스트 데이터를 초기화합니다.
+     * 테스트를 위한 보드 상태를 초기화하는 헬퍼 메서드입니다.
+     *
+     * @author 전종영
+     * @param pieces 기물의 위치와 종류를 담은 맵
+     * @return 초기화된 보드 상태 JSON 문자열
+     */
+    private String initializeBoardState(Map<String, String> pieces) {
+        try {
+            ObjectNode boardState = objectMapper.createObjectNode();
+            ObjectNode piecesNode = objectMapper.createObjectNode();
+
+            // 기본 킹 위치 설정 (필수)
+            piecesNode.put("4,0", "wK");
+            piecesNode.put("4,7", "bK");
+
+            // 추가 기물 위치 설정
+            pieces.forEach(piecesNode::put);
+
+            boardState.set("pieces", piecesNode);
+            return objectMapper.writeValueAsString(boardState);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize board state", e);
+        }
+    }
+
+    /**
+     * 테스트를 위한 게임 상태를 설정하는 헬퍼 메서드입니다.
+     *
+     * @author 전종영
      */
     @BeforeEach
     void setUp() {
@@ -66,20 +96,32 @@ public class ChessGameServiceTest {
         testGame.setWhiteTurn(true);
         testGame.setStatus(ChessGame.GameStatus.IN_PROGRESS);
 
-        // 초기 체스판 상태를 올바르게 설정
-        ObjectNode boardState = objectMapper.createObjectNode();
-        ObjectNode pieces = objectMapper.createObjectNode();
+        // 기본 보드 상태 설정
+        Map<String, String> initialPieces = new HashMap<>();
+        // 테스트에 필요한 기물 추가
+        testGame.setBoardState(initializeBoardState(initialPieces));
 
-        // 기본 기물 배치 (필요한 테스트에 따라 조정)
-        pieces.put("4,0", "wK");  // 백색 킹
-        pieces.put("4,7", "bK");  // 흑색 킹
-        boardState.set("pieces", pieces);
+        // 기본 Mocking 설정
+        when(gameRepository.findByRoom_IdAndStatus(anyLong(), any()))
+                .thenReturn(Optional.of(testGame));
+        when(gameRepository.save(any(ChessGame.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+    }
 
-        try {
-            testGame.setBoardState(objectMapper.writeValueAsString(boardState));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize board state", e);
-        }
+    /**
+     * 테스트별 특수한 보드 상태를 설정하는 메서드입니다.
+     *
+     * @author 전종영
+     */
+    void setupGameForPawnMove() {
+        Map<String, String> pieces = new HashMap<>();
+        pieces.put("1,1", "wP");  // 테스트할 폰 위치
+        testGame.setBoardState(initializeBoardState(pieces));
+
+        when(gameRepository.findByRoom_IdAndStatus(anyLong(), any()))
+                .thenReturn(Optional.of(testGame));
+        when(gameRepository.save(any(ChessGame.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     /**
@@ -322,29 +364,6 @@ public class ChessGameServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
     }
 
-    /**
-     * 폰 이동을 위한 보드 상태 설정
-     */
-    private void setupGameForPawnMove() {
-        ObjectNode boardState = objectMapper.createObjectNode();
-        ObjectNode pieces = objectMapper.createObjectNode();
-
-        // 기본 킹 위치 (모든 테스트에 필수)
-        pieces.put("4,0", "wK");
-        pieces.put("4,7", "bK");
-        // 테스트할 폰 위치
-        pieces.put("1,1", "wP");
-
-        boardState.set("pieces", pieces);
-
-        try {
-            testGame.setBoardState(objectMapper.writeValueAsString(boardState));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to setup pawn move state", e);
-        }
-
-        setupGameForMove();
-    }
 
     /**
      * 캐슬링을 위한 보드 상태 설정
