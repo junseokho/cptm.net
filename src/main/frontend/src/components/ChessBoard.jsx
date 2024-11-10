@@ -9,7 +9,7 @@ import '../assets/ChessBoard.css'; // 스타일 시트 경로 확인
  * @param {Function} props.onPieceClick - 사용자가 기물을 클릭할 때 호출되는 함수
  * @param {Function} props.onSquareClick - 사용자가 빈 칸을 클릭할 때 호출되는 함수
  * @param {Array} props.highlightedSquares - 이동 가능한 칸을 표시하는 배열
- * @param {Object} props.selectedSquare - 선택된 칸의 위치 객체 {col: number, row: number}
+ * @param {Object} props.selectedSquare - 선택된 칸의 위치 객체 {row: number, col: number}
  * @returns {JSX.Element} - 체스판을 렌더링하는 JSX 요소
  */
 const ChessBoard = ({ board, onPieceClick, onSquareClick, highlightedSquares, selectedSquare }) => {
@@ -17,8 +17,8 @@ const ChessBoard = ({ board, onPieceClick, onSquareClick, highlightedSquares, se
     /**
      * 하나의 칸(square)을 렌더링하는 함수
      *
-     * @param {number} i - 열 인덱스 (row)
-     * @param {number} j - 행 인덱스 (col)
+     * @param {number} i - 열 인덱스 (column)
+     * @param {number} j - 행 인덱스 (row)
      * @returns {JSX.Element} - 각 체스판 칸을 나타내는 JSX 요소
      */
     const renderSquare = (i, j) => {
@@ -27,12 +27,12 @@ const ChessBoard = ({ board, onPieceClick, onSquareClick, highlightedSquares, se
         let squareClasses = isLightBrown ? 'light-brown' : 'white';
 
         // 강조된 칸인지 확인
-        if (highlightedSquares.some(pos => pos.col === j && pos.row === i)) {
+        if (highlightedSquares.some(pos => pos.row === j && pos.col === i)) {
             squareClasses += ' highlight';
         }
 
         // 선택된 칸인지 확인
-        if (selectedSquare && selectedSquare.col === j && selectedSquare.row === i) {
+        if (selectedSquare && selectedSquare.row === j && selectedSquare.col === i) {
             squareClasses += ' selected';
         }
 
