@@ -44,10 +44,17 @@ public class Room {
 
     /**
      * 게임 준비 상태
-     * true일 경우 게임을 시작할 수 있는 상태입니다.
+     * true 일 경우 게임을 시작할 수 있는 상태입니다.
      */
     @Column(nullable = false)
     private boolean isGameStarted = false; // 게임 시작 여부
+
+    /**
+     * 방이 닫힌 상태
+     * true 일 경우 방이 닫힌 상태입니다.
+     */
+    @Column(nullable = false)
+    private boolean isRoomClosed = false; // 방이 닫힌 여부
 
     /** 방을 생성한 사용자 */
     @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계, 지연 로딩
@@ -86,6 +93,7 @@ public class Room {
         dto.setPlayersCount(this.playersCount);
         dto.setMaxPlayers(this.maxPlayers);
         dto.setGameStarted(this.isGameStarted);
+        dto.setRoomClosed(this.isRoomClosed);
         dto.setIsHostWhitePlayer(this.isHostWhitePlayer);
         return dto;
     }

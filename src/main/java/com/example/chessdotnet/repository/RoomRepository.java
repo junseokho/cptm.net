@@ -20,4 +20,11 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
      * @return 게임이 시작되지 않은 Room 객체들의 List
      */
     List<Room> findByIsGameStartedFalse();
+
+    /**
+     * 방이 닫힌 모든 방을 조회합니다.
+     *
+     * @return 방이 닫힌 Room 객체들의 List
+     */
+    List<Room> findByIsRoomClosedTrue();
 }
