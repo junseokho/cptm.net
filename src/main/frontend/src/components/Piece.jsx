@@ -32,7 +32,9 @@ export class Piece {
     isValidMove(position, board) {
         if (position.row < 0 || position.row > 7 || position.col < 0 || position.col > 7) return false;
         const pieceAtDestination = board[position.row][position.col];
-        return !(pieceAtDestination);
+        return !(pieceAtDestination && pieceAtDestination.color === this.color);
+
+
     }
 
     /**
@@ -303,11 +305,10 @@ export class King extends Piece {
                 if (row < 0 || row > 7 || col < 0 || col > 7) break;
                 const piece = board[row][col];
 
-                if (!piece || piece.color === this.color) {
-                    if (piece)
-                        break;
-                    else
-                        continue;
+                if (!piece) {
+                    continue; // No piece at this position, keep checking in the current direction
+                } else if (piece.color === this.color) {
+                    break; // piece in the way, stop this direction
                 }
 
                 /**
@@ -322,8 +323,7 @@ export class King extends Piece {
                     return true;
                 }
 
-                if (piece)
-                    break;
+                break;
             }
         }
 
