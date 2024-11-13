@@ -5,18 +5,20 @@
 export class Piece {
     /**
      * Creates a chess piece.
-     * @param {string} name - The name of the piece.
-     * @param {Object} position - The current position of the piece.
-     * @param {number} position.row - The row position.
-     * @param {number} position.col - The column position.
-     * @param {string} color - The color of the piece ('white' or 'black').
-     * @param {string} image - The image URL for the piece.
+     * @param {string} name The name of the piece.
+     * @param {Object} position The current position of the piece.
+     * @param {number} position.row The row position.
+     * @param {number} position.col The column position.
+     * @param {string} color The color of the piece ('white' or 'black').
+     * @param {string} image The image URL for the piece.
+     * @param {boolean} hasMoved true if piece hasn't moved or is not initial position
      */
-    constructor(name, position, color, image) {
+    constructor(name, position, color, image, hasMoved = false) {
         this.name = name;
         this.position = position;
         this.color = color;
         this.image = image;
+        this.hasMoved = hasMoved;
     }
 
     /**
@@ -29,8 +31,10 @@ export class Piece {
      */
     isValidMove(position, board) {
         if (position.row < 0 || position.row > 7 || position.col < 0 || position.col > 7) return false;
-        const pieceAtDestination = board[position.col][position.row];
-        return !(pieceAtDestination);
+        const pieceAtDestination = board[position.row][position.col];
+        return !(pieceAtDestination && pieceAtDestination.color === this.color);
+
+
     }
 
     /**
@@ -55,7 +59,7 @@ export class Piece {
 
                 moves.push(newPosition);
 
-                const pieceAtNewPosition = board[col][row];
+                const pieceAtNewPosition = board[row][col];
                 if (pieceAtNewPosition) {
                     if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
                     break;
@@ -78,10 +82,10 @@ export class Rook extends Piece {
      */
     getAvailableMoves(board) {
         const directions = [
-            { row: 1, col: 0 },  // right
-            { row: -1, col: 0 }, // left
-            { row: 0, col: 1 },  // down
-            { row: 0, col: -1 }  // up
+            { row: 1, col: 0 },
+            { row: -1, col: 0 },
+            { row: 0, col: 1 },
+            { row: 0, col: -1 }
         ];
         return this.get_valid_moves_on_way(directions, board);
     }
@@ -180,29 +184,31 @@ export class Pawn extends Piece {
         let moves = [];
         const direction = this.color === 'white' ? 1 : -1;
 
-        const oneStepForward = { row: this.position.row, col: this.position.col + direction };
-        if (this.isValidMove(oneStepForward, board) && !board[oneStepForward.col][oneStepForward.row]) {
+        const oneStepForward = { row: this.position.row + direction, col: this.position.col};
+        if (this.isValidMove(oneStepForward, board) && !board[oneStepForward.row][oneStepForward.col]) {
             moves.push(oneStepForward);
         }
 
         const startingRow = this.color === 'white' ? 1 : 6;
-        const twoStepsForward = { row: this.position.row, col: this.position.col + 2 * direction };
-        if (this.position.col === startingRow && !board[oneStepForward.col][oneStepForward.row] && !board[twoStepsForward.col][twoStepsForward.row]) {
+        const twoStepsForward = { row: this.position.row + 2 * direction, col: this.position.col };
+        if (this.position.row === startingRow && !board[oneStepForward.row][oneStepForward.col] && !board[twoStepsForward.row][twoStepsForward.col]) {
             moves.push(twoStepsForward);
         }
 
-        const leftDiagonal = { row: this.position.row - 1, col: this.position.col + direction };
-        const rightDiagonal = { row: this.position.row + 1, col: this.position.col + direction };
+        const leftDiagonal = { row: this.position.row + direction, col: this.position.col - 1 };
+        const rightDiagonal = { row: this.position.row + direction, col: this.position.col + 1 };
+
+        // todo Enpassant
 
         if (this.isValidMove(leftDiagonal, board)) {
-            const pieceAtLeftDiagonal = board[leftDiagonal.col]?.[leftDiagonal.row];
+            const pieceAtLeftDiagonal = board[leftDiagonal.row]?.[leftDiagonal.col];
             if (pieceAtLeftDiagonal && pieceAtLeftDiagonal.color !== this.color) {
                 moves.push(leftDiagonal);
             }
         }
 
         if (this.isValidMove(rightDiagonal, board)) {
-            const pieceAtRightDiagonal = board[rightDiagonal.col]?.[rightDiagonal.row];
+            const pieceAtRightDiagonal = board[rightDiagonal.row]?.[rightDiagonal.col];
             if (pieceAtRightDiagonal && pieceAtRightDiagonal.color !== this.color) {
                 moves.push(rightDiagonal);
             }
@@ -245,24 +251,26 @@ export class King extends Piece {
         // Castling logic
         if (!this.hasMoved && !this.isUnderAttack(this.position, board)) {
             // Check for Kingside Castling (right side)
-            const rookKingSide = board[this.position.col + 3]?.[this.position.row];
+            const rookKingSide = board[this.position.row][this.position.col + 3];
             if (rookKingSide instanceof Rook && !rookKingSide.hasMoved) {
-                if (!board[this.position.col + 1]?.[this.position.row] &&
-                    !board[this.position.col + 2]?.[this.position.row] &&
+                if (!board[this.position.row][this.position.col + 1] &&
+                    !board[this.position.row][this.position.col + 2] &&
                     !this.isUnderAttack({ row: this.position.row, col: this.position.col + 1 }, board) &&
-                    !this.isUnderAttack({ row: this.position.row, col: this.position.col + 2 }, board)) {
+                    !this.isUnderAttack({ row: this.position.row, col: this.position.col + 2 }, board)
+                ) {
                     moves.push({ row: this.position.row, col: this.position.col + 2 });
                 }
             }
 
             // Check for Queenside Castling (left side)
-            const rookQueenSide = board[this.position.col - 4]?.[this.position.row];
+            const rookQueenSide = board[this.position.row][this.position.col - 4];
             if (rookQueenSide instanceof Rook && !rookQueenSide.hasMoved) {
-                if (!board[this.position.col - 1]?.[this.position.row] &&
-                    !board[this.position.col - 2]?.[this.position.row] &&
-                    !board[this.position.col - 3]?.[this.position.row] &&
+                if (!board[this.position.row][this.position.col - 1] &&
+                    !board[this.position.row][this.position.col - 2] &&
+                    !board[this.position.row][this.position.col - 3] &&
                     !this.isUnderAttack({ row: this.position.row, col: this.position.col - 1 }, board) &&
-                    !this.isUnderAttack({ row: this.position.row, col: this.position.col - 2 }, board)) {
+                    !this.isUnderAttack({ row: this.position.row, col: this.position.col - 2 }, board)
+                ) {
                     moves.push({ row: this.position.row, col: this.position.col - 2 });
                 }
             }
@@ -287,7 +295,7 @@ export class King extends Piece {
             { row: -1, col: 1 }, { row: -1, col: -1 }
         ];
 
-        // Check for enemy rooks, queens, and bishops in all directions
+        // Check for enemy pieces (except for Knight) at possible positions to attack this square
         for (const direction of directions) {
             let row = position.row;
             let col = position.col;
@@ -295,13 +303,27 @@ export class King extends Piece {
                 row += direction.row;
                 col += direction.col;
                 if (row < 0 || row > 7 || col < 0 || col > 7) break;
-                const piece = board[col][row];
-                if (piece) {
-                    if (piece.color !== this.color && (piece instanceof Rook || piece instanceof Queen || piece instanceof Bishop)) {
-                        return true;
-                    }
-                    break;
+                const piece = board[row][col];
+
+                if (!piece) {
+                    continue; // No piece at this position, keep checking in the current direction
+                } else if (piece.color === this.color) {
+                    break; // piece in the way, stop this direction
                 }
+
+                /**
+                 * This `piece instanceof King` check is must be done.
+                 * Because the isUnderAttack() is called by King, if you call King.getAvailableMoves() to check isUnderAttack,
+                 * it may occur circular function call between two Kings
+                 * */
+                if (piece instanceof King) {
+                    if (Math.abs(row - position.row) <= 1 && Math.abs(col - position.col) <= 1)
+                        return true;
+                } else if (piece.getAvailableMoves(board).some(pos => pos.row === this.position.row && pos.col === this.position.col)) {
+                    return true;
+                }
+
+                break;
             }
         }
 
@@ -316,11 +338,9 @@ export class King extends Piece {
         for (const move of knightMoves) {
             const newRow = position.row + move.row;
             const newCol = position.col + move.col;
-            if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
-                const piece = board[newCol]?.[newRow];
-                if (piece && piece.color !== this.color && piece instanceof Knight) {
-                    return true;
-                }
+            const piece = board[newRow]?.[newCol];
+            if (piece instanceof Knight && piece.color !== this.color) {
+                return true;
             }
         }
 
