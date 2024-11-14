@@ -32,7 +32,7 @@ At same time, I define this `valid` as do not check rule of moves.
 At now, the concept of `legality of the move` is clear. To check Legality of the move,
 you need to check only rule of moves.   
    
-Now then, `ChessGameSession` is charge to validate `1` only and only if, while
+Now then, `Chessboard` is charge to validate `1` only and only if, while
 `Piece` is charge to check `Legality of the move`.
 
 
@@ -61,4 +61,4 @@ Now then, `ChessGameSession` is charge to validate `1` only and only if, while
 
 이제 `이동의 합법성`의 개념이 명확해졌습니다. 이동의 합법성을 확인하려면, 이동 규칙만 확인하면 됩니다.
 
-그러므로, `ChessGameSession`은 오직 `1`만 확인할 책임이 있으며, `Piece`는 `이동의 합법성`을 확인할 책임이 있습니다.
+그러므로, `Chessboard`은 오직 `1`만 확인할 책임이 있으며, `Piece`는 `이동의 합법성`을 확인할 책임이 있습니다.

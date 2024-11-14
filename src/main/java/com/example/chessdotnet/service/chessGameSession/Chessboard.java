@@ -24,7 +24,7 @@ public class Chessboard {
     /**
      * Piece color which represents that which side has turn now.
      */
-    public Piece.PieceColor turn;
+    public Piece.PieceColor turnNow;
 
     /**
      * Records of moves. (History of moves)
@@ -74,10 +74,10 @@ public class Chessboard {
 
         moveRecords.add(new ChessboardMove(new ChessboardPos(src), new ChessboardPos(dest)));
 
-        if (turn == Piece.PieceColor.BLACK) {
-            turn = Piece.PieceColor.WHITE;
+        if (turnNow == Piece.PieceColor.BLACK) {
+            turnNow = Piece.PieceColor.WHITE;
         } else {
-            turn = Piece.PieceColor.BLACK;
+            turnNow = Piece.PieceColor.BLACK;
         }
     }
 
@@ -89,6 +89,12 @@ public class Chessboard {
      * @param dest A coordinate of a destination
      */
     public boolean tryMovePiece(ChessboardPos src, ChessboardPos dest) {
+        if (!src.isValid())
+            return false;
+        if (!dest.isValid())
+            return false;
+        if (getPiece(src).pieceColor != turnNow)
+            return false;
         return getPiece(src).testAndMove(dest);
     }
 
@@ -142,7 +148,7 @@ public class Chessboard {
         }
 
         nullable_lastMoved = null;
-        turn = Piece.PieceColor.WHITE;
+        turnNow = Piece.PieceColor.WHITE;
         moveRecords = new LinkedList<>();
     }
 }
