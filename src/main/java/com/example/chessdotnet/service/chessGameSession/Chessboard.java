@@ -11,7 +11,7 @@ import java.util.LinkedList;
  */
 public class Chessboard {
     /**
-     * chessboard of game. 8x8 grid of Pieces.
+     * Chessboard of game. 8x8 grid of Pieces.
      */
     private Piece[][] chessboard;
 
@@ -32,12 +32,12 @@ public class Chessboard {
     public LinkedList<ChessboardMove> moveRecords;
 
     /**
-     * get piece in the square, `chessboard[row][col]`.
+     * Get piece in the square, `chessboard[row][col]`.
      * Caller must check if coordinate is valid.
      *
-     * @param row row index of board.
-     * @param col cow index of board.
-     * @return piece in the square at given coordinate.
+     * @param row Row index of board.
+     * @param col Cow index of board.
+     * @return Piece in the square at given coordinate.
      */
     public Piece getPiece(int row, int col) {
         Assert.isTrue(ChessboardPos.isValid(row, col), "Chessboard::getPiece() invalid arguments");
@@ -45,7 +45,7 @@ public class Chessboard {
     }
 
     /**
-     * get piece at given coordinate, `pos`
+     * Get piece at given coordinate, `pos`
      * Caller must check if coordinate is valid.
      *
      * @param pos coordinate in chessboard
@@ -57,14 +57,13 @@ public class Chessboard {
     }
 
     /**
-     * move a piece to dest in given coordinate.
+     * Move a piece to dest in given coordinate.
      * It is a safe way to update chessboard, maintaining coherency between chessboard and pieces.
      *
-     * @param src a coordinate of a piece which wants to move
-     * @param dest a coordinate of a destination
-     * @return `this` Chessboard instance
+     * @param src A coordinate of a piece which wants to move
+     * @param dest A coordinate of a destination
      */
-    public Chessboard movePiece(ChessboardPos src, ChessboardPos dest) {
+    public void movePiece(ChessboardPos src, ChessboardPos dest) {
         chessboard[dest.row][dest.col] = chessboard[src.row][src.col];
         chessboard[src.row][src.col] = new Piece(new ChessboardPos(src), Piece.PieceColor.NONE, this);
 
@@ -80,11 +79,31 @@ public class Chessboard {
         } else {
             turn = Piece.PieceColor.BLACK;
         }
-        return this;
     }
 
     /**
-     * constructor to generate initial state of chessboard
+     * Try to move a piece to dest given coordinate.
+     * This method is entry point to move a piece, updating Chessboard.
+     *
+     * @param src A coordinate of a piece which wants to move
+     * @param dest A coordinate of a destination
+     */
+    public boolean tryMovePiece(ChessboardPos src, ChessboardPos dest) {
+        return getPiece(src).testAndMove(dest);
+    }
+
+    /**
+     * Try to move a piece to dest given coordinate.
+     * This method is entry point to move a piece, updating Chessboard.
+     *
+     * @param move Coordinates of squares, start and destination.
+     */
+    public boolean tryMovePiece(ChessboardMove move) {
+        return getPiece(move.startPosition).testAndMove(move.endPosition);
+    }
+
+    /**
+     * Constructor to generate initial state of chessboard
      */
     public Chessboard() {
         final int BOARD_SIZE = 8;
