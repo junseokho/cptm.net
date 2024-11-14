@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 
 /**
- * class, extended by Actual Pieces (Rook, Bishop, ..., etc.)
+ * Class, extended by Actual Pieces (Rook, Bishop, ..., etc.)
  * Itself, it means empty square in chessboard. (I know that's such an Anti-pattern)
  */
 class Piece {
@@ -47,31 +47,31 @@ class Piece {
     }
 
     /**
-     * position in chessboard of this
+     * Position in chessboard of this
      */
     public ChessboardPos position;
 
     /**
-     * color (maybe WHITE or BLACK) of this
+     * Color (maybe WHITE or BLACK) of this
      */
     public PieceColor pieceColor;
 
     /**
-     * true if it moves at least once.
+     * True if it moves at least once.
      */
     public boolean hasMoved;
 
     /**
-     * chessboard which this piece belongs to.
+     * Chessboard which this piece belongs to.
      */
     public Chessboard chessboard;
 
     /**
-     * default constructor
+     * Default constructor
      *
-     * @param position position in chessboard.
-     * @param pieceColor color (maybe WHITE or BLACK) of this.
-     * @param chessboard chessboard where this piece exists.
+     * @param position Position in chessboard.
+     * @param pieceColor Color (maybe WHITE or BLACK) of this.
+     * @param chessboard Chessboard where this piece exists.
      */
     public Piece(ChessboardPos position, PieceColor pieceColor, Chessboard chessboard) {
         this.position = position;
@@ -82,19 +82,19 @@ class Piece {
 
 
     /**
-     * return its name(typename of piece)
+     * Return its name(typename of piece)
      *
-     * @return typename of piece
+     * @return Typename of piece
      */
     public String toString() {
         return "Piece";
     }
 
     /**
-     * check is it Empty Square (Not a Piece)
+     * Check is it Empty Square (Not a Piece)
      * Must be overridden
      *
-     * @return true if it is empty square
+     * @return True if it is empty square
      */
     public boolean isEmptySquare() {
         return true;
@@ -110,10 +110,10 @@ class Piece {
     }
 
     /**
-     * update its position and chessboard, if dest is reachable in one move by itself.
+     * Update its position and chessboard, if dest is reachable in one move by itself.
      *
-     * @param dest destination of move to test
-     * @return true if and only if position updated.
+     * @param dest Destination of move to test
+     * @return True if and only if position updated.
      */
     public boolean testAndMove(ChessboardPos dest) {
         return false;
@@ -125,9 +125,9 @@ class Piece {
      * Don't be confused, it **does not** add values onto `this.position` in directly.
      * Note that, this method is not designed for pieces which can jump over another piece.
      *
-     * @param pos position of chessboard to check
-     * @param stride direction added on `this.position` repeatedly.
-     * @return true if given position can be obtained by adding stride on `this.position` repeatedly.
+     * @param pos Position of chessboard to check
+     * @param stride Direction added on `this.position` repeatedly.
+     * @return True if given position can be obtained by adding stride on `this.position` repeatedly.
      */
     public boolean checkPosInDirection(ChessboardPos pos, ChessboardPos stride) {
         ChessboardPos candidatePos = new ChessboardPos(position);
@@ -155,8 +155,8 @@ class Piece {
      * Don't be confused, it **does not** add values onto `this.position` in directly.
      * Note that, this method is not designed for pieces which can jump over another piece.
      *
-     * @param out container to collect possible
-     * @param stride direction added on `this.position` repeatedly.
+     * @param out Container to collect possible
+     * @param stride Direction added on `this.position` repeatedly.
      */
     public void addSquaresInDirection(LinkedList<ChessboardPos> out, ChessboardPos stride) {
         ChessboardPos candidatePos = new ChessboardPos(position);

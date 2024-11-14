@@ -8,17 +8,17 @@ import java.util.LinkedList;
  */
 public class Pawn extends Piece {
     /**
-     * direction of forward of this pawn. (At now, this class supports only case that `directionForward.col` is zero.)
+     * Direction of forward of this pawn. (At now, this class supports only case that `directionForward.col` is zero.)
      */
     public ChessboardPos directionForward;
 
     /**
-     * default constructor
+     * Default constructor
      *
-     * @param position position in chessboard.
-     * @param pieceColor color (maybe WHITE or BLACK) of this.
-     * @param chessboard chessboard where this piece exists.
-     * @param directionForward stride of this pawn in forward.
+     * @param position Position in chessboard.
+     * @param pieceColor Color (maybe WHITE or BLACK) of this.
+     * @param chessboard Chessboard where this piece exists.
+     * @param directionForward Stride of this pawn in forward.
      */
     public Pawn(ChessboardPos position, PieceColor pieceColor, Chessboard chessboard, ChessboardPos directionForward) {
         super(position, pieceColor, chessboard);
@@ -26,9 +26,9 @@ public class Pawn extends Piece {
     }
 
     /**
-     * return its name(typename of piece)
+     * Return its name(typename of piece)
      *
-     * @return typename of piece
+     * @return Typename of piece
      */
     @Override
     public String toString() {
@@ -36,10 +36,10 @@ public class Pawn extends Piece {
     }
 
     /**
-     * check is it Empty Square (Not a Piece)
+     * Check is it Empty Square (Not a Piece)
      * Must be overridden
      *
-     * @return true if it is empty square
+     * @return True if it is empty square
      */
     @Override
     public boolean isEmptySquare() {
@@ -108,12 +108,12 @@ public class Pawn extends Piece {
     }
 
     /**
-     * update its position and chessboard, if dest is reachable in one move by itself.
+     * Update its position and chessboard, if dest is reachable in one move by itself.
      * It is a safe way to update chessboard, maintaining coherency between `piece.position`
      * and actual position in chessboard.
      *
-     * @param dest destination of move to test
-     * @return true if and only if position updated.
+     * @param dest Destination of move to test
+     * @return True if and only if position updated.
      */
     @Override
     public boolean testAndMove(ChessboardPos dest) {

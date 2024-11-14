@@ -4,20 +4,20 @@ import java.util.LinkedList;
 
 public class King extends Piece {
     /**
-     * default constructor
+     * Default constructor
      *
-     * @param position position in chessboard.
-     * @param pieceColor color (maybe WHITE or BLACK) of this.
-     * @param chessboard chessboard where this piece exists.
+     * @param position Position in chessboard.
+     * @param pieceColor Color (maybe WHITE or BLACK) of this.
+     * @param chessboard Chessboard where this piece exists.
      */
     public King(ChessboardPos position, Piece.PieceColor pieceColor, Chessboard chessboard) {
         super(position, pieceColor, chessboard);
     }
 
     /**
-     * return its name(typename of piece)
+     * Return its name(typename of piece)
      *
-     * @return typename of piece
+     * @return Typename of piece
      */
     @Override
     public String toString() {
@@ -25,10 +25,10 @@ public class King extends Piece {
     }
 
     /**
-     * check is it Empty Square (Not a Piece)
+     * Check is it Empty Square (Not a Piece)
      * Must be overridden
      *
-     * @return true if it is empty square
+     * @return True if it is empty square
      */
     @Override
     public boolean isEmptySquare() {
@@ -90,9 +90,9 @@ public class King extends Piece {
     }
 
     /**
-     * check if this king has threat. (determine is it `check`)
+     * Check if this king has threat. (determine is it `check`)
      *
-     * @return true if this king has threat.
+     * @return True if this king has threat.
      */
     public boolean checked() {
         return hasThreatAtSquare(this.position);
@@ -137,12 +137,12 @@ public class King extends Piece {
     }
 
     /**
-     * update its position and chessboard, if dest is reachable in one move by itself.
+     * Update its position and chessboard, if dest is reachable in one move by itself.
      * It is a safe way to update chessboard, maintaining coherency between `piece.position`
      * and actual position in chessboard.
      *
-     * @param dest destination of move to test
-     * @return true if and only if position updated.
+     * @param dest Destination of move to test
+     * @return true If and only if position updated.
      */
     @Override
     public boolean testAndMove(ChessboardPos dest) {
