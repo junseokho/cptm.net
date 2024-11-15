@@ -80,7 +80,6 @@ class Piece {
         this.chessboard = chessboard;
     }
 
-
     /**
      * Return its name(typename of piece)
      *
@@ -170,6 +169,7 @@ class Piece {
                 out.add(new ChessboardPos(candidatePos));
             } else if (chessboard.getPiece(candidatePos).pieceColor != this.pieceColor) {
                 out.add(new ChessboardPos(candidatePos));
+                return;
             } else {
                 /* from this position, blocked by the same colors */
                 break;

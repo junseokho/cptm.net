@@ -77,7 +77,10 @@ public class Rook extends Piece {
         if (diff.col != 0) diff.col /= Math.abs(diff.col);
 
         if (checkPosInDirection(dest, diff)) {
-            chessboard.movePiece(this.position, dest);
+            chessboard.movePiece(new ChessboardMove(
+                    new ChessboardPos(this.position),
+                    new ChessboardPos(dest)
+            ));
             return true;
         }
 

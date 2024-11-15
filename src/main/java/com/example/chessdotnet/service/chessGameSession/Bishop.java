@@ -67,7 +67,7 @@ public class Bishop extends Piece {
     @Override
     public boolean testAndMove(ChessboardPos dest) {
         //noinspection DuplicatedCode
-        ChessboardPos diff = ChessboardPos.sub(this.position, dest);
+        ChessboardPos diff = ChessboardPos.sub(dest, position);
         /* `diff.row == 0` is needed to check dest equals to this.position */
         if (Math.abs(diff.row) != Math.abs(diff.col) || diff.row == 0)
             return false;
@@ -77,7 +77,10 @@ public class Bishop extends Piece {
         diff.col = diff.col / Math.abs(diff.col);
 
         if (checkPosInDirection(dest, diff)) {
-            chessboard.movePiece(this.position, dest);
+            chessboard.movePiece(new ChessboardMove(
+                    new ChessboardPos(this.position),
+                    new ChessboardPos(dest)
+            ));
             return true;
         }
 

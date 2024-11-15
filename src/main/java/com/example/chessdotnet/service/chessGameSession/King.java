@@ -2,6 +2,10 @@ package com.example.chessdotnet.service.chessGameSession;
 
 import java.util.LinkedList;
 
+/**
+ * King class of chess piece.
+ * At now, its logic does not consider chess960 or any custom starting positions. (e.g. at Castling)
+ */
 public class King extends Piece {
     /**
      * Default constructor
@@ -50,16 +54,17 @@ public class King extends Piece {
 
         for (var direction : directions) {
             LinkedList<ChessboardPos> squaresToCheck = new LinkedList<>();
-            addSquaresInDirection(squaresToCheck, direction);
+            new Piece(pos, pieceColor, chessboard).addSquaresInDirection(squaresToCheck, direction);
             if (squaresToCheck.isEmpty())
                 continue;
-            var piece = chessboard.getPiece(squaresToCheck.getLast());
-            if (piece.isEmptySquare())
+            var pieceMayThreat = chessboard.getPiece(squaresToCheck.getLast());
+            if (pieceMayThreat.isEmptySquare())
                 continue;
-            if (piece.toString().equals(PieceType.KING.name) && squaresToCheck.size() == 1) {
+            /* squaresToCheck.size() means distance between src and dest (If they have different colors) */
+            if (pieceMayThreat.toString().equals(PieceType.KING.name) && squaresToCheck.size() == 2) {
                 return true;
             }
-            if (piece.getDestinations().contains(pos))
+            if (pieceMayThreat.getDestinations().contains(pos))
                 return true;
         }
 
@@ -122,16 +127,51 @@ public class King extends Piece {
             if (!candidatePos.isValid())
                 continue;
 
+            /* check it is empty or can be taken (only check if its color is different to this) */
             if (hasThreatAtSquare(candidatePos))
                 continue;
-
-            /* check it is empty or can be taken (only check if its color is different to this) */
             if (chessboard.getPiece(candidatePos).isEmptySquare()) {
                 dests.add(new ChessboardPos(candidatePos));
             } else if (chessboard.getPiece(candidatePos).pieceColor != this.pieceColor) {
                 dests.add(new ChessboardPos(candidatePos));
             }
         }
+
+        /* Step to check castling */
+        if (hasMoved || checked())
+            return dests;
+
+        if (!chessboard
+                .getPiece(position.row, 7)
+                .hasMoved
+                &&
+                chessboard
+                        .getPiece(position.row, 7)
+                        .toString().equals(PieceType.ROOK.name)) {
+            if (!hasThreatAtSquare(new ChessboardPos(position.row, 5))
+                    && !hasThreatAtSquare(new ChessboardPos(position.row, 6))
+                    && chessboard.getPiece(position.row, 5).isEmptySquare()
+                    && chessboard.getPiece(position.row, 6).isEmptySquare()
+            )
+                dests.add(new ChessboardPos(position.row, 6));
+        }
+
+        if (!chessboard
+                .getPiece(position.row, 0)
+                .hasMoved
+                &&
+                chessboard
+                        .getPiece(position.row, 0)
+                        .toString().equals(PieceType.ROOK.name)) {
+            if (!hasThreatAtSquare(new ChessboardPos(position.row, 2))
+                    && !hasThreatAtSquare(new ChessboardPos(position.row, 3))
+                    && chessboard.getPiece(position.row, 1).isEmptySquare()
+                    && chessboard.getPiece(position.row, 2).isEmptySquare()
+                    && chessboard.getPiece(position.row, 3).isEmptySquare()
+            )
+                dests.add(new ChessboardPos(position.row, 2));
+        }
+
 
         return dests;
     }
@@ -148,7 +188,13 @@ public class King extends Piece {
     public boolean testAndMove(ChessboardPos dest) {
         LinkedList<ChessboardPos> possibleDests = getDestinations();
         if (possibleDests.contains(dest)) {
-            chessboard.movePiece(this.position, dest);
+            ChessboardMove move = new ChessboardMove(
+                    new ChessboardPos(position),
+                    new ChessboardPos(dest)
+            );
+            if (Math.abs(dest.col - position.col) == 2)
+                move.setCastling();
+            chessboard.movePiece(move);
             return true;
         }
 

@@ -72,16 +72,19 @@ public class Queen extends Piece {
     @Override
     public boolean testAndMove(ChessboardPos dest) {
         //noinspection DuplicatedCode
-        ChessboardPos diff = ChessboardPos.sub(this.position, dest);
+        ChessboardPos diff = ChessboardPos.sub(dest, position);
 
         /* `diff.row == 0` is needed to check dest equals to this.position */
-        if (Math.abs(diff.row) == Math.abs(diff.col) || diff.row == 0) {
+        if (Math.abs(diff.row) == Math.abs(diff.col) && diff.row != 0) {
             /* make them into 1 or -1 */
             diff.row = diff.row / Math.abs(diff.row);
             diff.col = diff.col / Math.abs(diff.col);
 
             if (checkPosInDirection(dest, diff)) {
-                chessboard.movePiece(this.position, dest);
+                chessboard.movePiece(new ChessboardMove(
+                        new ChessboardPos(this.position),
+                        new ChessboardPos(dest)
+                ));
                 return true;
             }
             /* check if them have same row or col, but not both (XNOR) */
@@ -92,7 +95,10 @@ public class Queen extends Piece {
             if (diff.col != 0) diff.col /= Math.abs(diff.col);
 
             if (checkPosInDirection(dest, diff)) {
-                chessboard.movePiece(this.position, dest);
+                chessboard.movePiece(new ChessboardMove(
+                        new ChessboardPos(this.position),
+                        new ChessboardPos(dest)
+                ));
                 return true;
             }
         }

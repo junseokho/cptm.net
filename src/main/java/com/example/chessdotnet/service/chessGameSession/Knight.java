@@ -82,7 +82,10 @@ public class Knight extends Piece {
     public boolean testAndMove(ChessboardPos dest) {
         LinkedList<ChessboardPos> possibleDests = getDestinations();
         if (possibleDests.contains(dest)) {
-            chessboard.movePiece(this.position, dest);
+            chessboard.movePiece(new ChessboardMove(
+                    new ChessboardPos(this.position),
+                    new ChessboardPos(dest)
+            ));
             return true;
         }
 

@@ -1,5 +1,7 @@
 package com.example.chessdotnet.service.chessGameSession;
 
+import org.springframework.util.Assert;
+
 import java.util.LinkedList;
 
 
@@ -108,6 +110,17 @@ public class Pawn extends Piece {
     }
 
     /**
+     * Only check that destination of move is legal.
+     *
+     * @param dest Destination of a move.
+     * @return True if that destination is legal.
+     */
+    public boolean isLegalMove(ChessboardPos dest) {
+        LinkedList<ChessboardPos> possibleDests = getDestinations();
+        return possibleDests.contains(dest);
+    }
+
+    /**
      * Update its position and chessboard, if dest is reachable in one move by itself.
      * It is a safe way to update chessboard, maintaining coherency between `piece.position`
      * and actual position in chessboard.
@@ -117,12 +130,33 @@ public class Pawn extends Piece {
      */
     @Override
     public boolean testAndMove(ChessboardPos dest) {
-        LinkedList<ChessboardPos> possibleDests = getDestinations();
-        if (possibleDests.contains(dest)) {
-            chessboard.movePiece(this.position, dest);
+        if (isLegalMove(dest)) {
+            ChessboardMove move = new ChessboardMove(new ChessboardPos(position), new ChessboardPos(dest));
+            /* If it is en passant */
+            if (dest.col != position.col && chessboard.getPiece(dest).isEmptySquare()) {
+                move.setEnPassant(new ChessboardPos(position.row, dest.col));
+            }
+
+            /* Promotion is handled by `Pawn::testAndMovePromotion()` */
+            chessboard.movePiece(move);
             return true;
         }
 
+        return false;
+    }
+
+    /**
+     * If the move is promotion, you need to call this.
+     *
+     * @param move ChessboardMove instance built by caller.
+     * @return True if and only if position updated.
+     */
+    public boolean testAndMovePromotion(ChessboardMove move) {
+        Assert.isTrue(move.getPromotionInfo().getFirst(), "Need to have promotion info");
+        if (isLegalMove(move.endPosition)) {
+            chessboard.movePiece(move);
+            return true;
+        }
         return false;
     }
 }
