@@ -30,6 +30,9 @@ public class RoomDTO {
     /** 게임 시작 여부 */
     private boolean isGameStarted;
 
+    /** 게임 종료 여부 */
+    private boolean isRoomClosed;
+
     /**
      * 방장이 first move 인지
      */

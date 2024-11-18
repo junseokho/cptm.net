@@ -194,6 +194,8 @@ public class RoomService {
 
     /**
      * 방을 삭제하는 기능을 처리합니다.
+     * TODO : 게임이 시작된 방은 삭제할 수 없도록 수정
+     * TODO : 게임을 종료한 후에 DB의 방 정보를 삭제할 수 없도록 수정
      *
      * @param roomId 삭제할 방의 ID
      * @param userId 삭제를 요청한 사용자의 ID
