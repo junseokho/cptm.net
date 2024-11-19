@@ -13,16 +13,16 @@ import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.example.chessdotnet.entity.ChessGameSession;
-import com.example.chessdotnet.entity.GameStatus;
+import com.example.chessdotnet.service.ChessGameSession; /*<- 임시 */
+import com.example.chessdotnet.service.GameStatus; /*<- 임시 */
 
 /**
  * 체스 게임의 WebSocket 통신을 처리하는 컨트롤러입니다.
  * STOMP 프로토콜을 사용하여 실시간 게임 진행을 관리합니다.
  *
  * @author 전종영
- * @version 1.3
- * @since 2024-11-12
+ * @version 1.4
+ * @since 2024-11-16
  */
 @Controller
 @RequiredArgsConstructor
@@ -47,15 +47,18 @@ public class ChessGameController {
             // 이동 실행
             boolean moveSuccess = chessGameService.doMove(sessionId, moveDTO);
 
-            // 게임 상태 확인
+            /* 게임 상태 확인 */
             GameStatus gameStatus = chessGameService.checkGameClosed(sessionId);
 
-            // 현재 게임 세션 정보 조회
+            /* 현재 게임 세션 정보 조회 */
             ChessGameSession gameSession = chessGameService.getChessGameSession(sessionId);
 
             // 게임 상태 응답 생성
             Map<String, Object> response = new HashMap<>();
             response.put("moveSuccess", moveSuccess);
+            if (moveSuccess) {
+                response.put("move", moveDTO); // 이동 정보
+            }
             response.put("status", gameStatus);
             response.put("whiteTurn", gameSession != null ? gameSession.isWhiteTurn() : false);
 
@@ -66,12 +69,12 @@ public class ChessGameController {
             );
 
             // 게임이 종료된 경우 추가 메시지 전송
-            if (gameStatus != GameStatus.IN_PROGRESS) {
-                messagingTemplate.convertAndSend(
-                        "/topic/game/" + sessionId + "/end",
-                        Map.of("status", gameStatus)
-                );
-            }
+            // if (gameStatus != GameStatus.IN_PROGRESS) {
+            //     messagingTemplate.convertAndSend(
+            //             "/topic/game/" + sessionId + "/end",
+            //             Map.of("status", gameStatus)
+            //     );
+            // }
 
         } catch (Exception e) {
             log.error("Error processing move: {}", e.getMessage());
@@ -86,11 +89,13 @@ public class ChessGameController {
 
     /**
      * 기권 요청을 처리합니다.
+     * 누가 기권했는지에 따라 승자를 결정하고 결과를 전파합니다.
      *
      * @param headerAccessor WebSocket 세션 정보
+     * @param userId 기권한 사용자의 ID
      */
     @MessageMapping("/chess.resign")
-    public void handleResign(SimpMessageHeaderAccessor headerAccessor) {
+    public void handleResign(SimpMessageHeaderAccessor headerAccessor, Long userId) {
         String sessionId = headerAccessor.getSessionId();
         log.info("Resign request received - Session ID: {}", sessionId);
 
@@ -104,9 +109,10 @@ public class ChessGameController {
                         "/topic/game/" + sessionId,
                         Map.of(
                                 "status", "RESIGNED",
-                                "winner", gameSession.isWhiteTurn() ? "BLACK" : "WHITE"
+                                "winner", gameSession.isWhitePlayer(userId) ? "BLACK" : "WHITE"
                         )
                 );
+
             }
         } catch (Exception e) {
             log.error("Error processing resignation: {}", e.getMessage());
@@ -117,4 +123,6 @@ public class ChessGameController {
             );
         }
     }
+
+
 }
