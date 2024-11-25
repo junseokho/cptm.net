@@ -31,10 +31,10 @@ public class User {
 
     /**
      * 사용자의 레이팅 점수입니다.
-     * 기본값은 0입니다.
+     * 기본값은 1000입니다.
      */
     @Column(nullable = false)
-    private int rating = 0; // 사용자의 레이팅
+    private int rating = 1000; // 사용자의 레이팅
 
     /** 사용자가 생성한 방 목록 */
     @OneToMany(mappedBy = "host") // 일대다 관계, Room 엔티티의 host 필드에 매핑
