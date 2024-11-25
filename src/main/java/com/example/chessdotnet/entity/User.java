@@ -29,6 +29,13 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username; // 사용자 이름, 고유해야 함
 
+    /**
+     * 사용자의 레이팅 점수입니다.
+     * 기본값은 0입니다.
+     */
+    @Column(nullable = false)
+    private int rating = 0; // 사용자의 레이팅
+
     /** 사용자가 생성한 방 목록 */
     @OneToMany(mappedBy = "host") // 일대다 관계, Room 엔티티의 host 필드에 매핑
     private List<Room> createdRooms = new ArrayList<>(); // 필드 초기화
@@ -48,6 +55,7 @@ public class User {
         dto.setUsername(this.username);
         dto.setCreatedRoomsCount(this.createdRooms.size());
         dto.setJoinedRoomsCount(this.joinedRooms.size());
+        dto.setRating(this.rating);
         return dto;
     }
 }
