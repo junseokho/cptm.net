@@ -29,7 +29,10 @@ public class Room {
     @Column(nullable = false)
     private int playersCount = 1; // 현재 플레이어 수, 기본값 1
 
-    /** 관전자 참여가능 여부 */
+    /** 관전자 참여가능 여부
+     * canJoinAsSpectator = true 이면 관전자 참여 가능
+     * canJoinAsSpectator = false 이면 방 자체가 조회되지 않음
+     * */
     @Column(nullable = false)
     private boolean canJoinAsSpectator = false; // 관전자로 참여 가능 여부
 
