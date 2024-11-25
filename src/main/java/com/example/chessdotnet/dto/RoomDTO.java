@@ -12,9 +12,6 @@ public class RoomDTO {
     /** 방의 고유 식별자 */
     private Long id;
 
-    /** 방 제목 */
-    private String title;
-
     /** 방 생성자의 ID */
     private Long hostId;
 
@@ -24,17 +21,6 @@ public class RoomDTO {
     /** 현재 방에 참여 중인 플레이어 수 */
     private int playersCount;
 
-    /** 방의 최대 플레이어 수 */
-    private int maxPlayers;
-
-    /** 게임 시작 여부 */
-    private boolean isGameStarted;
-
-    /** 게임 종료 여부 */
-    private boolean isRoomClosed;
-
-    /**
-     * 방장이 first move 인지
-     */
-    private Boolean isHostWhitePlayer;
+    /** 관전자 참여가능 여부 */
+    private boolean canJoinAsSpectator;
 }
