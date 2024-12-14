@@ -3,9 +3,10 @@ package com.example.chessdotnet.dto;
 import lombok.Data;
 
 /**
- * 방 정보를 전송하기 위한 데이터 전송 객체(DTO)입니다.
+ * `Room` 정보를 클라이언트에게 전송하기 위한 DTO 입니다.
  *
  * @author 전종영
+ * @apiNote 앞으로 필드가 추가될 수 있습니다.
  */
 @Data
 public class RoomDTO {
@@ -21,20 +22,24 @@ public class RoomDTO {
     /** 방 생성자의 이름 */
     private String hostUsername;
 
-    /** 현재 방에 참여 중인 플레이어 수 */
-    private int playersCount;
+    /** 방 생성자의 레이팅 */
+    private Integer hostRating;
 
-    /** 방의 최대 플레이어 수 */
-    private int maxPlayers;
+    /** 플레이어로 참가 가능 여부 */
+    private Boolean isRoomPlayable;
 
-    /** 게임 시작 여부 */
-    private boolean isGameStarted;
+    /** 관전 가능 여부 */
+    private Boolean isRoomSpectable;
 
     /** 게임 종료 여부 */
-    private boolean isRoomClosed;
+    private Boolean isGameDone;
 
-    /**
-     * 방장이 first move 인지
-     */
-    private Boolean isHostWhitePlayer;
+    /** 타임 컨트롤 - 분 */
+    private Integer timeControlMin;
+
+    /** 타임 컨트롤 - 초 */
+    private Integer timeControlSec;
+
+    /** 타임 컨트롤 - 증초 */
+    private Integer timeControlInc;
 }
