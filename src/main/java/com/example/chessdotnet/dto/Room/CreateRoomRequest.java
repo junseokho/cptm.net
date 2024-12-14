@@ -1,9 +1,6 @@
-package com.example.chessdotnet.dto;
+package com.example.chessdotnet.dto.Room;
 
 import lombok.Data;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Max;
 
 /**
  * 새로운 방 생성 요청을 위한 DTO(Data Transfer Object) 클래스입니다.
