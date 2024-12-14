@@ -42,10 +42,14 @@ public class RoomController {
      */
     @PostMapping("/create")
     public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody CreateRoomRequest request) {
-        log.info("방 생성 요청: {}", request.getTitle());
-        RoomDTO room = roomService.createRoom(request.getTitle(), request.getHostId());
-        log.info("방 생성 완료. 방 ID: {}", room.getId());
-        return ResponseEntity.ok(room);
+        RoomDTO createdRoom;
+        try {
+            createdRoom = roomService.createRoom(request.getHostId());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        log.info("방 생성 완료. 방 ID: {}", createdRoom.getId());
+        return ResponseEntity.ok(createdRoom);
     }
 
     /**
