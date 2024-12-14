@@ -1,4 +1,4 @@
-package com.example.chessdotnet.dto;
+package com.example.chessdotnet.dto.Room;
 
 import lombok.Data;
 import jakarta.validation.constraints.NotNull;
