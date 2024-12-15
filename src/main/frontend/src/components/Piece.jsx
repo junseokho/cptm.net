@@ -1,3 +1,4 @@
+import ChessBoard from "./ChessBoard.jsx";
 
 
 /**
@@ -68,7 +69,7 @@ export class Piece {
                 }
             }
         }
-        return moves;
+        return filterValidMoves(moves, board, this, ChessBoard);
     }
 }
 
@@ -89,7 +90,7 @@ export class Rook extends Piece {
             { row: 0, col: 1 },
             { row: 0, col: -1 }
         ];
-        return this.get_valid_moves_on_way(directions, board);
+        return filterValidMoves(this.get_valid_moves_on_way(directions, board), board, this, ChessBoard);
     }
 }
 
@@ -110,7 +111,7 @@ export class Bishop extends Piece {
             { row: -1, col: 1 }, // up-right
             { row: -1, col: -1 } // up-left
         ];
-        return this.get_valid_moves_on_way(directions, board);
+        return filterValidMoves(this.get_valid_moves_on_way(directions, board), board, this, ChessBoard);
     }
 }
 
@@ -135,7 +136,7 @@ export class Queen extends Piece {
             { row: -1, col: 1 }, // up-right
             { row: -1, col: -1 } // up-left
         ];
-        return this.get_valid_moves_on_way(directions, board);
+        return filterValidMoves(this.get_valid_moves_on_way(directions, board), board, this, ChessBoard);
     }
 }
 
@@ -168,7 +169,8 @@ export class Knight extends Piece {
             }
         }
 
-        return moves;
+        return filterValidMoves(moves, board, this, ChessBoard);
+
     }
 }
 
@@ -264,7 +266,7 @@ export class Pawn extends Piece {
             }
         }
 
-        return moves;
+        return filterValidMoves(moves, board, this, ChessBoard);
     }
 
 }
@@ -348,7 +350,7 @@ export class King extends Piece {
             }
         }
 
-        return moves
+        return filterValidMoves(moves, board, this, ChessBoard);
 
     }
 
@@ -434,49 +436,42 @@ export class King extends Piece {
 }
 
 /**
- * 킹이 공격받지 않도록 이동 가능한 칸을 필터링
- * @param {Array} moves - 원래 이동 가능 칸 목록
- * @param {Object} board - 현재 체스판 배열
- * @param {Object} piece - 선택된 기물
- * @returns {Array} - 킹이 안전한 이동 가능 칸 목록
+ * 킹이 체크를 피하기 위해 이동 가능 칸을 필터링
+ * @param {Array} moves - 원래 이동 가능 경로
+ * @param {Array} board - 현재 체스판 상태 배열
+ * @param {Piece} piece - 이동하려는 기물 객체
+ * @param {Object} chessboardState - 체스보드 상태 (킹 위치, 턴, 이동 기록 등)
+ * @returns {Array} - 체크를 피할 수 있는 유효한 이동 경로
  */
-/**
- * 킹이 공격받지 않도록 이동 가능한 칸을 필터링
- * @param {Array} moves - 원래 이동 가능 칸 목록
- * @param {Object} Chessboard - 체스보드 상태 객체
- * @param {Object} piece - 선택된 기물
- * @returns {Array} - 킹이 안전한 이동 가능 칸 목록
- */
-function filterValidMoves(moves, Chessboard, piece) {
+function filterValidMoves(moves, board, piece, chessboardState) {
     const safeMoves = [];
-
 
     for (const move of moves) {
         // 체스판 복제
-        const newBoard = Chessboard.board.map(row => [...row]);
+        const simulatedBoard = board.map(row => [...row]);
 
         // 기물을 임시로 이동
-        newBoard[piece.position.row][piece.position.col] = null;
-        newBoard[move.row][move.col] = piece;
-
-        // 기물 위치 임시 업데이트
         const originalPosition = { ...piece.position };
+        simulatedBoard[originalPosition.row][originalPosition.col] = null;
+        simulatedBoard[move.row][move.col] = piece;
+
+        // 기물의 임시 위치 업데이트
         piece.position = { row: move.row, col: move.col };
 
-        // 킹의 위치 계산
+        // 킹의 위치 계산 (킹이 직접 이동하는 경우와 아닌 경우 처리)
         const kingPosition = piece instanceof King
-            ? { row: move.row, col: move.col } // 킹이 직접 이동하는 경우
-            : findKingPosition(newBoard, piece.color);
+            ? piece.position
+            : findKingPosition(simulatedBoard, piece.color);
 
-        // 킹이 공격받는지 확인
-        const isUnderAttack = piece.isUnderAttack(kingPosition, { board: newBoard });
+        // 킹이 체크 상태인지 확인
+        const king = new King('King', kingPosition, piece.color, null); // 임시 King 객체 생성
+        const isInCheck = king.isUnderAttack(kingPosition, { ...chessboardState, board: simulatedBoard });
 
-        // 킹이 공격받지 않으면 안전한 이동 경로로 추가
-        if (!isUnderAttack) {
-            safeMoves.push(move);
+        if (!isInCheck) {
+            safeMoves.push(move); // 킹이 체크되지 않는 경우에만 유효 이동 경로로 추가
         }
 
-        // 기물 위치 복원
+        // 기물의 원래 위치 복원
         piece.position = originalPosition;
     }
 
@@ -489,7 +484,7 @@ function filterValidMoves(moves, Chessboard, piece) {
  * @param {string} color - 찾으려는 킹의 색상 ('white' 또는 'black')
  * @returns {Object|null} - 킹의 위치 객체 { row, col } 또는 null (킹이 없는 경우)
  */
-export function findKingPosition(board, color) {
+function findKingPosition(board, color) {
     for (let row = 0; row < board.length; row++) {
         for (let col = 0; col < board[row].length; col++) {
             const piece = board[row][col];
