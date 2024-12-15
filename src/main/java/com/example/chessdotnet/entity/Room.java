@@ -1,12 +1,9 @@
 package com.example.chessdotnet.entity;
 
-import com.example.chessdotnet.dto.RoomDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * 체스 게임 방을 나타내는 엔티티 클래스입니다.
@@ -14,50 +11,44 @@ import java.util.Set;
  *
  * @author 전종영
  */
-@Entity // JPA 엔티티임을 나타냄
-@Table(name = "rooms") // 데이터베이스 테이블 이름 지정
-@Getter @Setter // Lombok을 사용하여 getter와 setter 메소드 자동 생성
+@Entity
+@Table(name = "room")
+@Getter
+@Setter
 public class Room {
-    /** 방의 고유 식별자 */
-    @Id // 기본 키 필드
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 생성 전략
+    /**
+     * The unique identifier for a room.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** 현재 방에 참여한 플레이어 수, 기본값은 1 (방장)
-     * playersCount = 2가 되면 게임 시작 가능
-     * */
-    @Column(nullable = false)
-    private int playersCount = 1; // 현재 플레이어 수, 기본값 1
-
-    /** 관전자 참여가능 여부
-     * canJoinAsSpectator = true 이면 관전자 참여 가능
-     * canJoinAsSpectator = false 이면 방 자체가 조회되지 않음
-     * */
-    @Column(nullable = false)
-    private boolean canJoinAsSpectator = false; // 관전자로 참여 가능 여부
-
-    /** 방을 생성한 사용자 */
-    @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계, 지연 로딩
-    @JoinColumn(name = "host_id", nullable = false)
-    private User host; // 방 생성자
-
-    /** 방에 참여한 플레이어 */
-    @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계, 지연 로딩
-    @JoinColumn(name = "player_id", nullable = false)
-    private User joinedPlayer; // 방에 참여한 플레이어
+    /**
+     * The player who created the room.
+     */
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "hostPlayer", referencedColumnName = "userId") // Assuming 'userId' is the PK of User
+    private User hostPlayer;
 
     /**
-     * Room 엔티티를 RoomDTO로 변환합니다.
-     *
-     * @return 변환된 RoomDTO 객체
+     * The player who joined the room. Can be null if no player has joined yet.
      */
-    public RoomDTO toDTO() {
-        RoomDTO dto = new RoomDTO();
-        dto.setId(this.id);
-        dto.setHostId(this.host.getId());
-        dto.setHostUsername(this.host.getUsername());
-        dto.setPlayersCount(this.playersCount);
-        dto.setCanJoinAsSpectator(this.canJoinAsSpectator);
-        return dto;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "joinedPlayer", referencedColumnName = "userId")
+    private User joinedPlayer;
+
+    /**
+     * The time control in minutes for the chess game.
+     */
+    private int timeControlMin;
+
+    /**
+     * The time control in seconds for the chess game.
+     */
+    private int timeControlSec;
+
+    /**
+     * The increment in seconds for each move in the chess game.
+     */
+    private int timeControlInc;
 }
