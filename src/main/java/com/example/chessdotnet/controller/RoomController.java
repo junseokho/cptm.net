@@ -72,10 +72,9 @@ public class RoomController {
      *
      * @return 사용 가능한 방 목록
      */
-    @GetMapping("/available")
-    public ResponseEntity<List<RoomDTO>> getAvailableRooms() {
-        log.info("사용 가능한 방 목록 요청");
-        List<RoomDTO> rooms = roomService.getAvailableRooms();
+    @GetMapping("/playable")
+    public ResponseEntity<List<RoomDTO>> getPlayableRooms() {
+        List<RoomDTO> rooms = roomService.getPlayableRooms();
         log.info("사용 가능한 방 {} 개 조회됨", rooms.size());
         return ResponseEntity.ok(rooms);
     }
