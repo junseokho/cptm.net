@@ -23,7 +23,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
      */
     @Query("SELECT r FROM Room r " +
             "WHERE NOT EXISTS (SELECT cg FROM ChessGame cg WHERE cg.room = r) " + // 아직 게임이 시작하지 않았거나
-            "OR EXISTS (SELECT cg FROM ChessGame cg WHERE cg.room = r AND cg.endTime IS NULL)") // 게임이 시작 되었지만 종료되지 않은 방
+            "OR EXISTS (SELECT cg FROM ChessGame cg WHERE cg.room = r AND cg.playedEndTime IS NULL)") // 게임이 시작 되었지만 종료되지 않은 방
     List<Room> findSpectatableRooms();
 
     /**
@@ -41,7 +41,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
      */
     @Query("SELECT CASE " +
             "WHEN COUNT(cg) = 0 THEN true " + // No ChessGame, then spectatable
-            "ELSE (cg.endTime IS NULL) " + // If ChessGame exists, it's spectatable if playedEndTime is null
+            "ELSE (cg.playedEndTime IS NULL) " + // If ChessGame exists, it's spectatable if playedEndTime is null
             "END " +
             "FROM ChessGame cg " +
             "WHERE cg.room.id = :roomId")

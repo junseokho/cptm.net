@@ -12,7 +12,7 @@ import lombok.Setter;
  * @author 전종영
  */
 @Entity
-@Table(name = "room")
+@Table(name = "rooms")
 @Getter
 @Setter
 public class Room {
@@ -27,14 +27,14 @@ public class Room {
      * The player who created the room.
      */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "hostPlayer", referencedColumnName = "userId") // Assuming 'userId' is the PK of User
+    @JoinColumn(name = "host_player", referencedColumnName = "id")
     private User hostPlayer;
 
     /**
      * The player who joined the room. Can be null if no player has joined yet.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "joinedPlayer", referencedColumnName = "userId")
+    @JoinColumn(name = "joined_player", referencedColumnName = "id")
     private User joinedPlayer;
 
     /**
