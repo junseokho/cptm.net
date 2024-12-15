@@ -55,17 +55,16 @@ public class RoomController {
     /**
      * 사용자가 특정 방에 참여합니다.
      *
-     * @param request 방 참여 요청 request body
+     * @param roomId 참여할 방의 ID
+     * @param request 방 참여 요청 정보
      * @return 업데이트된 방 정보
      */
-    @PostMapping("/join")
-    public ResponseEntity<RoomDTO> joinRoom(@Valid @RequestBody JoinRoomRequest request) {
-        try {
-            RoomDTO room = roomService.joinRoom(request);
-            return ResponseEntity.ok(room);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    @PostMapping("/{roomId}/join")
+    public ResponseEntity<RoomDTO> joinRoom(@PathVariable Long roomId, @Valid @RequestBody JoinRoomRequest request) {
+        log.info("방 참여 요청. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
+        RoomDTO room = roomService.joinRoom(roomId, request.getUserId());
+        log.info("방 참여 완료. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
+        return ResponseEntity.ok(room);
     }
 
     /**
@@ -73,20 +72,11 @@ public class RoomController {
      *
      * @return 사용 가능한 방 목록
      */
-    @GetMapping("/playable")
-    public ResponseEntity<List<RoomDTO>> getPlayableRooms() {
-        List<RoomDTO> rooms = roomService.getPlayableRooms();
-        return ResponseEntity.ok(rooms);
-    }
-
-    /**
-     * 관전자로 참여 가능한 모든 방의 목록을 조회합니다.
-     *
-     * @return 관전 가능한 방 목록
-     */
-    @GetMapping("/spectatable")
-    public ResponseEntity<List<RoomDTO>> getSpectatableRooms() {
-        List<RoomDTO> rooms = roomService.getSpectateableRooms();
+    @GetMapping("/available")
+    public ResponseEntity<List<RoomDTO>> getAvailableRooms() {
+        log.info("사용 가능한 방 목록 요청");
+        List<RoomDTO> rooms = roomService.getAvailableRooms();
+        log.info("사용 가능한 방 {} 개 조회됨", rooms.size());
         return ResponseEntity.ok(rooms);
     }
 
