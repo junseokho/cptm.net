@@ -183,17 +183,18 @@ public class RoomService {
     }
 
     /**
-     * 관전 가능한 모든 방의 목록을 반환합니다.
-     * 관전이 허용되고 플레이어가 2명인 방만 조회됩니다.
+     * 관전 가능한 모든 Room 의 List 를 반환합니다.
+     * 현재 관전 가능한(spectatable) 방은 게임이 시작되지 않은 방을 포함해,
+     * 게임이 종료되지 않은 모든 방입니다.
      *
      * @return 관전 가능한 방들의 DTO 리스트
      */
     public List<RoomDTO> getSpectateableRooms() {
-        List<Room> spectateableRooms = roomRepository.findSpectateableRooms();
+        List<Room> spectateableRooms = roomRepository.findSpectatableRooms();
         log.info("Found {} spectateable rooms", spectateableRooms.size());
         return spectateableRooms.stream()
-                .map(Room::toDTO)
-                .collect(Collectors.toList());
+                .map(this::buildRoomDTOFromEntity)
+                .toList();
     }
 
     /**
