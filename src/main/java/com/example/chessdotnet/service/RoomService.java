@@ -70,22 +70,23 @@ public class RoomService {
      * 새로운 방을 생성합니다.
      * 방 생성자는 자동으로 해당 방의 첫 번째 플레이어가 됩니다.
      *
-     * @param hostId 방을 생성하는 사용자의 ID
+     * @param createRoomRequest 방 생성 요청 정보 (request body)
      * @return 생성된 Room의 DTO
      * @throws UserNotFoundException 지정된 ID의 사용자를 찾을 수 없는 경우
      */
-    public RoomDTO createRoom(Long hostId) {
-        User host = userRepository.findById(hostId)
+    public RoomDTO createRoom(CreateRoomRequest createRoomRequest) {
+        User hostPlayer = userRepository.findById(createRoomRequest.getHostId())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         Room room = new Room();
-        room.setHost(host);
-        room.setPlayersCount(1); // 방장만 있는 상태
-        room.setCanJoinAsSpectator(false); // 기본적으로 관전 불가
+        room.setHostPlayer(hostPlayer);
+        room.setTimeControlMin(createRoomRequest.getTimeControlMin());
+        room.setTimeControlSec(createRoomRequest.getTimeControlSec());
+        room.setTimeControlInc(createRoomRequest.getTimeControlInc());
 
         Room savedRoom = roomRepository.save(room);
-        log.info("Room created - ID: {}, Host: {}", savedRoom.getId(), host.getUsername());
+        log.info("Room created - ID: {}, Host: {}", savedRoom.getId(), hostPlayer.getUsername());
 
-        return savedRoom.toDTO();
+        return buildRoomDTOFromEntity(savedRoom);
     }
 
     /**

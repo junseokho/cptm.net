@@ -1,9 +1,9 @@
 package com.example.chessdotnet.controller;
 
-import com.example.chessdotnet.dto.CreateRoomRequest;
-import com.example.chessdotnet.dto.JoinRoomRequest;
-import com.example.chessdotnet.dto.LeaveRoomRequest;
-import com.example.chessdotnet.dto.RoomDTO;
+import com.example.chessdotnet.dto.Room.CreateRoomRequest;
+import com.example.chessdotnet.dto.Room.JoinRoomRequest;
+import com.example.chessdotnet.dto.Room.LeaveRoomRequest;
+import com.example.chessdotnet.dto.Room.RoomDTO;
 import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
 import com.example.chessdotnet.exception.UserNotInRoomException;
@@ -44,7 +44,7 @@ public class RoomController {
     public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody CreateRoomRequest request) {
         RoomDTO createdRoom;
         try {
-            createdRoom = roomService.createRoom(request.getHostId());
+            createdRoom = roomService.createRoom(request);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
