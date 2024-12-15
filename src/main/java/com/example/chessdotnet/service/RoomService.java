@@ -1,6 +1,7 @@
 package com.example.chessdotnet.service;
 
-import com.example.chessdotnet.dto.RoomDTO;
+import com.example.chessdotnet.dto.Room.CreateRoomRequest;
+import com.example.chessdotnet.dto.Room.RoomDTO;
 import com.example.chessdotnet.dto.RoomStatusMessage;
 import com.example.chessdotnet.entity.Room;
 import com.example.chessdotnet.entity.User;
@@ -35,6 +36,35 @@ public class RoomService {
     private final ChessGameRepository chessGameRepository;
     private final RoomWebSocketService webSocketService;
     private final ChessGameService chessGameService;
+
+    /**
+     * Room 엔티티를 RoomDTO로 변환합니다.
+     *
+     * @return 변환된 RoomDTO 객체
+     */
+    public RoomDTO buildRoomDTOFromEntity(Room room) {
+        RoomDTO dto = new RoomDTO();
+
+        Long roomId = room.getId();
+        User hostPlayer = room.getHostPlayer();
+        User joinedPlayer = room.getJoinedPlayer();
+
+        dto.setId(roomId);
+        dto.setHostId(hostPlayer.getId());
+        dto.setHostUsername(hostPlayer.getUsername());
+        dto.setHostRating(hostPlayer.getRating());
+        dto.setJoinedId(joinedPlayer == null ? null : joinedPlayer.getId());
+        dto.setJoinedUsername(joinedPlayer == null ? null : joinedPlayer.getUsername());
+        dto.setJoinedRating(joinedPlayer == null ? null : joinedPlayer.getRating());
+        dto.setCanJoinAsPlayer(joinedPlayer == null);
+        dto.setCanJoinAsSpectator(roomRepository.canJoinAsSpectator(room.getId()));
+        dto.setIsGameDone(!roomRepository.canJoinAsSpectator(room.getId()));
+        dto.setTimeControlMin(room.getTimeControlMin());
+        dto.setTimeControlSec(room.getTimeControlSec());
+        dto.setTimeControlInc(room.getTimeControlInc());
+
+        return dto;
+    }
 
     /**
      * 새로운 방을 생성합니다.
