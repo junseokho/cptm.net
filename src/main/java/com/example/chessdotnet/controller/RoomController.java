@@ -79,17 +79,6 @@ public class RoomController {
     }
 
     /**
-     * 관전자로 참여 가능한 모든 방의 목록을 조회합니다.
-     *
-     * @return 관전 가능한 방 목록
-     */
-    @GetMapping("/spectatable")
-    public ResponseEntity<List<RoomDTO>> getSpectatableRooms() {
-        List<RoomDTO> rooms = roomService.getSpectateableRooms();
-        return ResponseEntity.ok(rooms);
-    }
-
-    /**
      * 게임을 시작하고 체스 기물을 초기 배치합니다.
      *
      * @param roomId 게임을 시작할 방의 ID
