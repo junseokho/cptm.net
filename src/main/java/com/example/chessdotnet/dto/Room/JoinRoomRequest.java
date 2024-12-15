@@ -4,16 +4,20 @@ import lombok.Data;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * 방 참여 요청을 위한 DTO(Data Transfer Object) 클래스입니다.
+ * 방 참여 요청 Request body 에 대한 DTO.
  *
  * @author 전종영
  */
-@Data // getter, setter, toString 등을 자동 생성
+@Data
 public class JoinRoomRequest {
     /**
-     * 방에 참여하려는 사용자의 ID입니다.
-     * 이 필드는 null이 될 수 없습니다.
+     * 참여하려는 방의 ID.
      */
-    @NotNull(message = "사용자 ID는 필수입니다")
-    private Long userId; // 방에 참여하려는 사용자 ID
+    @NotNull
+    private Long roomId;
+    /**
+     * 방에 참여하려는 사용자의 ID.
+     */
+    @NotNull
+    private Long userId;
 }
