@@ -170,16 +170,16 @@ public class RoomService {
 
     /**
      * 참여 가능한 모든 방의 목록을 반환합니다.
-     * joinedPlayer 가 없는 (null) 방이 조회됩니다.
+     * 플레이어가 한 명이면서 관전 모드가 아닌 방만 조회됩니다.
      *
-     * @return 참여 가능한 방의 RoomDTO 리스트
+     * @return 참여 가능한 방들의 DTO 리스트
      */
-    public List<RoomDTO> getPlayableRooms() {
-        List<Room> playableRooms = roomRepository.findPlayableRooms();
-        log.info("Found {} playable rooms", playableRooms.size());
-        return playableRooms.stream()
-                .map(this::buildRoomDTOFromEntity)
-                .toList();
+    public List<RoomDTO> getAvailableRooms() {
+        List<Room> availableRooms = roomRepository.findJoinableRooms();
+        log.info("Found {} available rooms for joining", availableRooms.size());
+        return availableRooms.stream()
+                .map(Room::toDTO)
+                .collect(Collectors.toList());
     }
 
     /**
