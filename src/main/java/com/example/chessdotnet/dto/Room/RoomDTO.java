@@ -32,10 +32,10 @@ public class RoomDTO {
     private Integer joinedRating;
 
     /** 플레이어로 참가 가능 여부 */
-    private Boolean isRoomPlayable;
+    private Boolean canJoinAsPlayer;
 
     /** 관전 가능 여부 */
-    private Boolean isRoomSpectable;
+    private Boolean canJoinAsSpectator;
 
     /** 게임 종료 여부 */
     private Boolean isGameDone;
