@@ -281,60 +281,31 @@ public class RoomService {
 
     /**
      * 방을 삭제하는 기능을 처리합니다.
-     * 게임 시작 전에만 실제 DB에서 삭제가 가능하며,
-     * 게임이 시작된 후에는 삭제가 불가능하고,
-     * 게임이 종료된 방은 DB에서 삭제할 수 없습니다.
+     * 게임 시작 전에만 삭제가 가능하며, `hostPlayer` 만 삭제할 권한이 있습니다.
      *
      * @param roomId 삭제할 방의 ID
      * @param userId 삭제를 요청한 사용자의 ID
      * @throws RoomNotFoundException 지정된 ID의 방을 찾을 수 없는 경우
-     * @throws UserNotFoundException 지정된 ID의 사용자를 찾을 수 없는 경우
-     * @throws IllegalStateException 방 생성자가 아닌 사용자가 삭제를 시도하는 경우,
-     *                              게임이 시작된 방을 삭제하려는 경우,
-     *                              게임이 종료된 방을 삭제하려는 경우
+     * @throws IllegalStateException 이미 게임이 시작된 경우
      */
     @Transactional
     public void deleteRoom(Long roomId, Long userId) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found"));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        // 방장 권한 확인
-        if (!room.getHost().getId().equals(user.getId())) {
+        // 예외 체크 (validation)
+        if (!room.getHostPlayer().getId().equals(userId)) {
             throw new IllegalStateException("Only the host can delete the room");
         }
 
-        // 게임 상태 확인
-        ChessGame game = chessGameRepository.findByRoom_Id(roomId).orElse(null);
-
+        ChessGame gameOfRoom = chessGameRepository.findById(roomId).orElse(null);
         // 게임이 이미 시작된 경우
-        if (room.getPlayersCount() == 2 && room.isCanJoinAsSpectator()) {
-            throw new IllegalStateException("Cannot delete room: game is in progress");
+        if (gameOfRoom != null) {
+            throw new IllegalStateException("Game already started");
         }
 
-        // 게임이 종료된 경우
-        if (game != null && game.getPlayedEndTime() != null) {
-            throw new IllegalStateException("Cannot delete room: game has ended and is part of match history");
-        }
+        roomRepository.delete(room);
 
-        // 게임 시작 전인 경우에만 실제 DB에서 삭제
-        if (room.getPlayersCount() < 2 && !room.isCanJoinAsSpectator()) {
-            log.info("Deleting room from database - Room ID: {}, Host: {}",
-                    roomId, user.getUsername());
-            roomRepository.delete(room);
-        } else {
-            log.error("Attempt to delete room in invalid state - Room ID: {}, Players: {}, " +
-                    "Spectatable: {}", roomId, room.getPlayersCount(), room.isCanJoinAsSpectator());
-            throw new IllegalStateException("Room can only be deleted before game starts");
-        }
-
-        webSocketService.notifyRoomStatusChanged(
-                room.toDTO(),
-                RoomStatusMessage.MessageType.ROOM_DELETED
-        );
-
-        log.info("Room deleted - ID: {}, Host: {}", roomId, user.getUsername());
+        log.info("Room deleted - ID: {} by userId: {}", roomId, userId);
     }
 }
