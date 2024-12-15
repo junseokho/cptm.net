@@ -55,17 +55,16 @@ public class RoomController {
     /**
      * 사용자가 특정 방에 참여합니다.
      *
-     * @param request 방 참여 요청 request body
+     * @param roomId 참여할 방의 ID
+     * @param request 방 참여 요청 정보
      * @return 업데이트된 방 정보
      */
-    @PostMapping("/join")
-    public ResponseEntity<RoomDTO> joinRoom(@Valid @RequestBody JoinRoomRequest request) {
-        try {
-            RoomDTO room = roomService.joinRoom(request);
-            return ResponseEntity.ok(room);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    @PostMapping("/{roomId}/join")
+    public ResponseEntity<RoomDTO> joinRoom(@PathVariable Long roomId, @Valid @RequestBody JoinRoomRequest request) {
+        log.info("방 참여 요청. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
+        RoomDTO room = roomService.joinRoom(roomId, request.getUserId());
+        log.info("방 참여 완료. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
+        return ResponseEntity.ok(room);
     }
 
     /**
