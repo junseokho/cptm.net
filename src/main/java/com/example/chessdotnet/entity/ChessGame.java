@@ -20,7 +20,6 @@ import java.util.Date;
 @Getter
 @Setter
 public class ChessGame {
-
     /**
      * 게임의 고유 식별자입니다.
      */
