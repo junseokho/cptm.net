@@ -1,6 +1,7 @@
 package com.example.chessdotnet.service;
 
 import com.example.chessdotnet.dto.Room.CreateRoomRequest;
+import com.example.chessdotnet.dto.Room.JoinRoomRequest;
 import com.example.chessdotnet.dto.Room.RoomDTO;
 import com.example.chessdotnet.dto.RoomStatusMessage;
 import com.example.chessdotnet.entity.Room;
@@ -93,79 +94,35 @@ public class RoomService {
      * 사용자가 특정 게임 방에 참여합니다.
      * 이미 다른 플레이어가 있는 경우 참여가 제한됩니다.
      *
-     * @param roomId 참여할 방의 ID
-     * @param userId 참여하는 사용자의 ID
-     * @return 업데이트된 Room의 DTO
-     * @throws RoomNotFoundException 방을 찾을 수 없을 때 발생
-     * @throws UserNotFoundException 사용자를 찾을 수 없을 때 발생
-     * @throws IllegalStateException 방이 이미 가득 찼을 때 발생
+     * @param request 방 참여 요청 request body*
+     * @return 방 참여 요청 반영 후 Room 정보
+     * @throws RoomNotFoundException 유효하지 않은 방
+     * @throws UserNotFoundException 유효하지 않은 유저
+     * @throws IllegalStateException 참여 불가능한 방
      */
     @Transactional
-    public RoomDTO joinRoom(Long roomId, Long userId) {
-        Room room = roomRepository.findById(roomId)
+    public RoomDTO joinRoom(JoinRoomRequest request) {
+        log.info("방 참여 요청. 방 ID: {}, 사용자 ID: {}", request.getRoomId(), request.getUserId());
+
+        Room roomToJoin = roomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new RoomNotFoundException("Room not found"));
-        User user = userRepository.findById(userId)
+        User joinedPlayer = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (room.getPlayersCount() >= 2) {
-            throw new IllegalStateException("Room is full");
+        // 이미 방에 다른 플레이어가 존재하는 경우
+        if (roomToJoin.getJoinedPlayer() != null) {
+            throw new IllegalStateException("Cannot join as player: joinedPlayer already exists");
         }
 
-        if (user.getId().equals(room.getHost().getId())) {
-            throw new IllegalStateException("User is already in the room as host");
+        if (joinedPlayer.getId().equals(roomToJoin.getHostPlayer().getId())) {
+            throw new IllegalStateException("User is already in the same room as host");
         }
 
-        room.setJoinedPlayer(user);
-        room.setPlayersCount(2);
+        roomToJoin.setJoinedPlayer(joinedPlayer);
 
-        Room updatedRoom = roomRepository.save(room);
-        RoomDTO roomDTO = updatedRoom.toDTO();
+        Room updatedRoom = roomRepository.save(roomToJoin);
 
-        webSocketService.notifyRoomStatusChanged(
-                roomDTO,
-                RoomStatusMessage.MessageType.PLAYER_JOINED
-        );
-
-        log.info("Player joined - Room ID: {}, Player: {}", roomId, user.getUsername());
-        return roomDTO;
-    }
-
-    /**
-     * 사용자가 관전자로 방에 입장합니다.
-     *
-     * @param roomId 관전하려는 방의 ID
-     * @param userId 관전하려는 사용자의 ID
-     * @return 입장한 방의 DTO
-     * @throws RoomNotFoundException 방을 찾을 수 없을 때 발생
-     * @throws UserNotFoundException 사용자를 찾을 수 없을 때 발생
-     * @throws IllegalStateException 관전이 불가능한 방에 입장하려 할 때 발생
-     */
-    @Transactional
-    public RoomDTO joinAsSpectator(Long roomId, Long userId) {
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RoomNotFoundException("Room not found"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        if (!room.isCanJoinAsSpectator()) {
-            throw new IllegalStateException("This room does not allow spectators");
-        }
-
-        // 이미 플레이어인 경우 관전 불가
-        if (user.getId().equals(room.getHost().getId()) ||
-                (room.getJoinedPlayer() != null && user.getId().equals(room.getJoinedPlayer().getId()))) {
-            throw new IllegalStateException("Players cannot join as spectators");
-        }
-
-        // 관전자 입장 알림
-        webSocketService.notifyRoomStatusChanged(
-                room.toDTO(),
-                RoomStatusMessage.MessageType.SPECTATOR_JOINED
-        );
-
-        log.info("Spectator joined - Room ID: {}, User: {}", roomId, user.getUsername());
-
-        return room.toDTO();
+        return buildRoomDTOFromEntity(updatedRoom);
     }
 
     /**
