@@ -3,6 +3,7 @@ package com.example.chessdotnet.repository;
 import com.example.chessdotnet.entity.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
@@ -15,30 +16,34 @@ import java.util.List;
  */
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
-
-    /**
-     * 새로운 플레이어가 참여 가능한 방을 조회합니다.
-     *
-     * @param count 현재 플레이어 수
-     * @return 참여 가능한 Room 객체들의 List
-     */
-    List<Room> findByPlayersCount(int count);
-
     /**
      * 관전 가능한 모든 방을 조회합니다.
-     * 관전이 허용되고 플레이어가 2명인 방을 반환합니다.
      *
      * @return 관전 가능한 Room 객체들의 List
      */
-    @Query("SELECT r FROM Room r WHERE r.canJoinAsSpectator = true AND r.playersCount = 2 ORDER BY r.id DESC")
-    List<Room> findSpectateableRooms();
+    @Query("SELECT r FROM Room r " +
+            "WHERE NOT EXISTS (SELECT cg FROM ChessGame cg WHERE cg.room = r) " + // 아직 게임이 시작하지 않았거나
+            "OR EXISTS (SELECT cg FROM ChessGame cg WHERE cg.room = r AND cg.endTime IS NULL)") // 게임이 시작 되었지만 종료되지 않은 방
+    List<Room> findSpectatableRooms();
 
     /**
      * 새로운 플레이어가 참여할 수 있는 방을 조회합니다.
-     * playersCount가 1이면서 관전 모드가 아닌 방을 반환합니다.
      *
      * @return 참여 가능한 Room 객체들의 List
      */
-    @Query("SELECT r FROM Room r WHERE r.playersCount = 1 AND r.canJoinAsSpectator = false ORDER BY r.id DESC")
-    List<Room> findJoinableRooms();
+    @Query("SELECT r FROM Room r WHERE r.joinedPlayer = NULL")
+    List<Room> findPlayableRooms();
+
+    /**
+     * 방이 관전 가능한지 반환합니다.
+     *
+     * @return True if room is spectatable, False otherwise
+     */
+    @Query("SELECT CASE " +
+            "WHEN COUNT(cg) = 0 THEN true " + // No ChessGame, then spectatable
+            "ELSE (cg.endTime IS NULL) " + // If ChessGame exists, it's spectatable if playedEndTime is null
+            "END " +
+            "FROM ChessGame cg " +
+            "WHERE cg.room.id = :roomId")
+    Boolean canJoinAsSpectator(@Param("roomId") Long roomId);
 }
