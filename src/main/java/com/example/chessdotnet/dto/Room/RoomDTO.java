@@ -16,7 +16,7 @@ public class RoomDTO {
     /** 방 생성자의 ID */
     private Long hostId;
 
-    /** 방 생성자의 이름 */
+    /** 방 생성자의 username */
     private String hostUsername;
 
     /** 방 생성자의 레이팅 */
