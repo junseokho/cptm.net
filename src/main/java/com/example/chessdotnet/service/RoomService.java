@@ -3,7 +3,8 @@ package com.example.chessdotnet.service;
 import com.example.chessdotnet.dto.Room.CreateRoomRequest;
 import com.example.chessdotnet.dto.Room.JoinRoomRequest;
 import com.example.chessdotnet.dto.Room.RoomDTO;
-import com.example.chessdotnet.dto.RoomStatusMessage;
+// import com.example.chessdotnet.dto.RoomStatusMessage;
+import com.example.chessdotnet.dto.Room.SpectateRoomRequest;
 import com.example.chessdotnet.entity.Room;
 import com.example.chessdotnet.entity.User;
 import com.example.chessdotnet.entity.ChessGame;
@@ -125,6 +126,37 @@ public class RoomService {
         return buildRoomDTOFromEntity(updatedRoom);
     }
 
+    /**
+     * 사용자의 관전 요청을 처리합니다.
+     *
+     * @param request 방 관전 요청 request body
+     * @return 방 참여 요청 반영 후 Room 정보
+     * @throws RoomNotFoundException 유효하지 않은 방
+     * @throws IllegalStateException 관전 불가능한 방
+     */
+    public RoomDTO spectateRoom(SpectateRoomRequest request) {
+        log.info("방 관전 요청. 방 ID: {}, 사용자 ID: {}", request.getRoomId(), request.getUserId());
+
+        Room roomToSpectate = roomRepository.findById(request.getRoomId())
+                .orElseThrow(() -> new RoomNotFoundException("Room not found"));
+
+        if (!roomRepository.canJoinAsSpectator(request.getRoomId())) {
+            throw new IllegalStateException("Cannot join as spectator");
+        }
+
+        // @TODO 관전자를 핸들링하기 위한 추가 로직 필요
+        // 관전자 입장 알림
+//        webSocketService.notifyRoomStatusChanged(
+//                buildRoomDTOFromEntity(room),
+//                RoomStatusMessage.MessageType.SPECTATOR_JOINED
+//        );
+//
+//        log.info("Spectator joined - Room ID: {}, User: {}", roomId, user.getUsername());
+//
+//        return buildRoomDTOFromEntity(room);
+
+        return buildRoomDTOFromEntity(roomToSpectate);
+    }
     /**
      * 참여 가능한 모든 방의 목록을 반환합니다.
      * joinedPlayer 가 없는 (null) 방이 조회됩니다.

@@ -1,9 +1,6 @@
 package com.example.chessdotnet.controller;
 
-import com.example.chessdotnet.dto.Room.CreateRoomRequest;
-import com.example.chessdotnet.dto.Room.JoinRoomRequest;
-import com.example.chessdotnet.dto.Room.LeaveRoomRequest;
-import com.example.chessdotnet.dto.Room.RoomDTO;
+import com.example.chessdotnet.dto.Room.*;
 import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
 import com.example.chessdotnet.exception.UserNotInRoomException;
@@ -62,6 +59,22 @@ public class RoomController {
     public ResponseEntity<RoomDTO> joinRoom(@Valid @RequestBody JoinRoomRequest request) {
         try {
             RoomDTO room = roomService.joinRoom(request);
+            return ResponseEntity.ok(room);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * 사용자가 요청한 방에 대한 관전을 요청합니다.
+     *
+     * @param request 방 관전 요청 request body
+     * @return 관전하고자 하는 `Room` 의 정보 DTO
+     */
+    @PostMapping("/spectate")
+    public ResponseEntity<RoomDTO> spectateRoom(@Valid @RequestBody SpectateRoomRequest request) {
+        try {
+            RoomDTO room = roomService.spectateRoom(request);
             return ResponseEntity.ok(room);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
