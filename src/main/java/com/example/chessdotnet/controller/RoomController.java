@@ -128,9 +128,12 @@ public class RoomController {
     @DeleteMapping("/{roomId}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId, @RequestParam Long userId) {
         log.info("방 삭제 요청. 방 ID: {}, 사용자 ID: {}", roomId, userId);
-        roomService.deleteRoom(roomId, userId);
-        log.info("방 삭제 완료. 방 ID: {}", roomId);
-        return ResponseEntity.noContent().build();
+        try {
+            roomService.deleteRoom(roomId, userId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
