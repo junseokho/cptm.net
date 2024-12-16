@@ -4,6 +4,8 @@ import com.example.chessdotnet.entity.ChessGame;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 체스 게임 세션을 관리하는 클래스입니다.
@@ -156,5 +158,33 @@ public class ChessGameSession {
      */
     public Long getGameId() {
         return this.gameId;
+    }
+
+    /**
+     * 게임 관전자들의 세션 ID를 관리하는 Set입니다.
+     * ConcurrentHashMap.newKeySet()을 사용하여 동시성을 제어합니다.
+     *
+     * @author 전종영
+     */
+    private Set<String> spectatorSessions = ConcurrentHashMap.newKeySet();
+
+    /**
+     * 관전자 세션을 추가합니다.
+     *
+     * @param sessionId 관전자의 WebSocket 세션 ID
+     * @author 전종영
+     */
+    public void addSpectator(String sessionId) {
+        spectatorSessions.add(sessionId);
+    }
+
+    /**
+     * 관전자 세션을 제거합니다.
+     *
+     * @param sessionId 제거할 관전자의 WebSocket 세션 ID
+     * @author 전종영
+     */
+    public void removeSpectator(String sessionId) {
+        spectatorSessions.remove(sessionId);
     }
 }
