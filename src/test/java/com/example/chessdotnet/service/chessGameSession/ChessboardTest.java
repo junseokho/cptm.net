@@ -558,4 +558,34 @@ public class ChessboardTest {
         moves.add(parseMove("f8 f7").clearIsLegal());
         runMoves(moves);
     }
+
+    @Test
+    void moveIllegal_promotionNotOnLastRank() {
+        LinkedList<ChessboardMoveForTest> moves = new LinkedList<>();
+
+        moves.add((ChessboardMoveForTest)(parseMove("e2 e4").clearIsLegal().setPromotionToWhat(Piece.PieceType.QUEEN)));
+        runMoves(moves);
+    }
+
+    @Test
+    void moveIllegal_promotionFromNotPawn() {
+        LinkedList<ChessboardMoveForTest> moves = new LinkedList<>();
+
+        moves.add((ChessboardMoveForTest)(parseMove("g1 f3").clearIsLegal().setPromotionToWhat(Piece.PieceType.QUEEN)));
+        runMoves(moves);
+    }
+
+    @Test
+    void moveLegal_checkIsItCheckmate() {
+        LinkedList<ChessboardMoveForTest> moves = new LinkedList<>();
+
+        moves.add(parseMove("e2 e4"));
+        moves.add(parseMove("f7 f6"));
+        moves.add(parseMove("f1 c4"));
+        moves.add(parseMove("g7 g5"));
+        moves.add(parseMove("d1 h5"));
+        var boardAfterMoves = runMoves(moves);
+        Assert.isTrue(boardAfterMoves.isCheckNow(), "IsCheck: False Negative");
+        Assert.isTrue(!boardAfterMoves.hasAnyLegalMove(), "hasLegalMove: False Negative");
+    }
 }

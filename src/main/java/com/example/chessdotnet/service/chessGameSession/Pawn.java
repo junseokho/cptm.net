@@ -153,7 +153,7 @@ public class Pawn extends Piece {
      */
     public boolean testAndMovePromotion(ChessboardMove move) {
         Assert.isTrue(move.getPromotionInfo().getFirst(), "Need to have promotion info");
-        if (isLegalMove(move.endPosition)) {
+        if ((move.endPosition.row == 0 || move.endPosition.row == 7) && isLegalMove(move.endPosition)) {
             chessboard.movePiece(move);
             return true;
         }

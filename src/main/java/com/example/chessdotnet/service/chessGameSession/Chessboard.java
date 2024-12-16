@@ -183,15 +183,20 @@ public class Chessboard {
 
         boolean ret;
         if (move.getPromotionInfo().getFirst()) {
-            switch (move.getPromotionInfo().getSecond()) {
-                case QUEEN :
-                case ROOK :
-                case BISHOP :
-                case KNIGHT :
-                    ret = ((Pawn)getPiece(move.startPosition)).testAndMovePromotion(move);
-                    break;
-                default:
-                    ret =  false;
+            // Promotion is requested but it was not pawn
+            if (!getPiece(move.startPosition).toString().equals(Piece.PieceType.PAWN.name)) {
+                ret = false;
+            } else {
+                switch (move.getPromotionInfo().getSecond()) {
+                    case QUEEN:
+                    case ROOK:
+                    case BISHOP:
+                    case KNIGHT:
+                        ret = ((Pawn) getPiece(move.startPosition)).testAndMovePromotion(move);
+                        break;
+                    default:
+                        ret = false;
+                }
             }
         } else
             ret = getPiece(move.startPosition).testAndMove(move.endPosition);
@@ -247,6 +252,111 @@ public class Chessboard {
             return false;
         }
         return ret;
+    }
+
+    /**
+     * Only check is this move legal by call `Chessboard::tryMovePiece`.
+     * After try to move, rollback it.
+     *
+     * @param move
+     * @return
+     */
+    public boolean tryMoveAndRollback(ChessboardMove move) {
+        var src = move.startPosition;
+        var dest = move.endPosition;
+
+        Piece srcPiece = getPiece(src);
+        Piece destPiece = getPiece(src);
+        var befo_nullable_lastMoved = nullable_lastMoved;
+
+        boolean moveRes = tryMovePiece(move);
+
+        if (moveRes) {
+            nullable_lastMoved = befo_nullable_lastMoved;
+            chessboard[src.row][src.col] = srcPiece;
+            chessboard[dest.row][dest.col] = destPiece;
+
+            if (turnNow == Piece.PieceColor.BLACK) {
+                turnNow = Piece.PieceColor.WHITE;
+            } else {
+                turnNow = Piece.PieceColor.BLACK;
+            }
+
+            moveRecords.removeLast();
+
+            if (move.isCastling()) {
+                ChessboardPos castleDirection = ChessboardPos.sub(dest, src);
+                int colOfRook;
+                if (castleDirection.col > 0) {
+                    colOfRook = 7;
+                } else {
+                    colOfRook = 0;
+                }
+
+                int rowOfRook = dest.row;
+
+                ChessboardPos newPosOfRook = new ChessboardPos(
+                        rowOfRook,
+                        castleDirection.col > 0 ? dest.col - 1 : dest.col + 1
+                );
+
+                chessboard[rowOfRook][colOfRook] = chessboard[newPosOfRook.row][newPosOfRook.col];
+                chessboard[rowOfRook][colOfRook].position = new ChessboardPos(rowOfRook, colOfRook);
+                chessboard[newPosOfRook.row][newPosOfRook.col] = new Piece(
+                        new ChessboardPos(rowOfRook, colOfRook),
+                        Piece.PieceColor.NONE,
+                        this
+                );
+            }
+
+            if (move.getEnPassantInfo().getFirst()) {
+                ChessboardPos pawnTaken = move.getEnPassantInfo().getSecond();
+                chessboard[pawnTaken.row][pawnTaken.col] = new Pawn(
+                        new ChessboardPos(pawnTaken),
+                        (turnNow == Piece.PieceColor.BLACK) ? Piece.PieceColor.WHITE : Piece.PieceColor.BLACK,
+                        this,
+                        (turnNow == Piece.PieceColor.BLACK) ? new ChessboardPos(1, 0) : new ChessboardPos(-1, 0)
+                );
+            }
+        }
+        return moveRes;
+    }
+
+    /**
+     * Check is king checked in this turn.
+     *
+     * @return true if the king of this turn checked, false otherwise.
+     */
+    public boolean isCheckNow() {
+        var kingToTest = turnNow == Piece.PieceColor.BLACK ? blackKing : whiteKing;
+        return kingToTest.checked();
+    }
+
+    /**
+     * Check is there any legal move in this turn.
+     *
+     * @return true if any legal move exists, false otherwise.
+     */
+    public boolean hasAnyLegalMove() {
+        // for all pieces on board
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                // pieces having color of this turn
+                if (!chessboard[r][c].isEmptySquare() && chessboard[r][c].pieceColor == turnNow) {
+                    var validDestinations = chessboard[r][c].getDestinations();
+                    for (var dest : validDestinations) {
+                        ChessboardMove move = new ChessboardMove(new ChessboardPos(r, c), dest);
+                        if (chessboard[r][c].toString().equals(Piece.PieceType.PAWN.name) && (r == 7 || r == 0)) {
+                            move.setPromotionToWhat(Piece.PieceType.QUEEN);
+                        }
+                        if (tryMoveAndRollback(move)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
