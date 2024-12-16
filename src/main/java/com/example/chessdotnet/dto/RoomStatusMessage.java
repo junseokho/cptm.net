@@ -1,5 +1,6 @@
 package com.example.chessdotnet.dto;
 
+import com.example.chessdotnet.dto.Room.RoomDTO;
 import lombok.Data;
 
 /**
