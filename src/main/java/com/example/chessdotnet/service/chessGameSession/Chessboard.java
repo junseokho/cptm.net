@@ -183,15 +183,20 @@ public class Chessboard {
 
         boolean ret;
         if (move.getPromotionInfo().getFirst()) {
-            switch (move.getPromotionInfo().getSecond()) {
-                case QUEEN :
-                case ROOK :
-                case BISHOP :
-                case KNIGHT :
-                    ret = ((Pawn)getPiece(move.startPosition)).testAndMovePromotion(move);
-                    break;
-                default:
-                    ret =  false;
+            // Promotion is requested but it was not pawn
+            if (!getPiece(move.startPosition).toString().equals(Piece.PieceType.PAWN.name)) {
+                ret = false;
+            } else {
+                switch (move.getPromotionInfo().getSecond()) {
+                    case QUEEN:
+                    case ROOK:
+                    case BISHOP:
+                    case KNIGHT:
+                        ret = ((Pawn) getPiece(move.startPosition)).testAndMovePromotion(move);
+                        break;
+                    default:
+                        ret = false;
+                }
             }
         } else
             ret = getPiece(move.startPosition).testAndMove(move.endPosition);

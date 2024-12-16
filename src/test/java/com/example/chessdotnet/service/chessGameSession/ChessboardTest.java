@@ -558,4 +558,20 @@ public class ChessboardTest {
         moves.add(parseMove("f8 f7").clearIsLegal());
         runMoves(moves);
     }
+
+    @Test
+    void moveIllegal_promotionNotOnLastRank() {
+        LinkedList<ChessboardMoveForTest> moves = new LinkedList<>();
+
+        moves.add((ChessboardMoveForTest)(parseMove("e2 e4").clearIsLegal().setPromotionToWhat(Piece.PieceType.QUEEN)));
+        runMoves(moves);
+    }
+
+    @Test
+    void moveIllegal_promotionFromNotPawn() {
+        LinkedList<ChessboardMoveForTest> moves = new LinkedList<>();
+
+        moves.add((ChessboardMoveForTest)(parseMove("g1 f3").clearIsLegal().setPromotionToWhat(Piece.PieceType.QUEEN)));
+        runMoves(moves);
+    }
 }
