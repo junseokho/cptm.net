@@ -4,7 +4,7 @@ import com.example.chessdotnet.dto.Room.*;
 import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
 import com.example.chessdotnet.exception.UserNotInRoomException;
-import com.example.chessdotnet.service.ChessGameService;
+import com.example.chessdotnet.service.chessGameSession.ChessGameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -106,20 +106,17 @@ public class RoomController {
     /**
      * 게임을 시작하고 체스 기물을 초기 배치합니다.
      *
-     * @param roomId 게임을 시작할 방의 ID
-     * @param initialPieces 초기 기물 배치 정보 리스트
+     * @param request 게임을 시작 요청 대한 정보 request body
      * @return 업데이트된 방 정보
      */
-    @PostMapping("/{roomId}/start")
-    public ResponseEntity<RoomDTO> startGame(
-            @PathVariable Long roomId,
-            @Valid @RequestBody List<ChessGameService.InitialPieceDTO> initialPieces) {
-        log.info("게임 시작 요청. 방 ID: {}", roomId);
-        RoomDTO room = roomService.startGame(roomId, initialPieces);
-        log.info("게임 시작 완료. 방 ID: {}, 방장 색상: {}",
-                roomId,
-                room.getIsHostWhitePlayer() ? "백" : "흑");
-        return ResponseEntity.ok(room);
+    @PostMapping("/startGame")
+    public ResponseEntity<RoomDTO> startGame(@Valid @RequestBody StartGameRequest request) {
+        try {
+            RoomDTO room = roomService.startGame(request);
+            return ResponseEntity.ok(room);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**

@@ -1,10 +1,8 @@
 package com.example.chessdotnet.service;
 
-import com.example.chessdotnet.dto.Room.CreateRoomRequest;
-import com.example.chessdotnet.dto.Room.JoinRoomRequest;
-import com.example.chessdotnet.dto.Room.RoomDTO;
+import com.example.chessdotnet.dto.Room.*;
 // import com.example.chessdotnet.dto.RoomStatusMessage;
-import com.example.chessdotnet.dto.Room.SpectateRoomRequest;
+import com.example.chessdotnet.dto.RoomStatusMessage;
 import com.example.chessdotnet.entity.Room;
 import com.example.chessdotnet.entity.User;
 import com.example.chessdotnet.entity.ChessGame;
@@ -12,6 +10,7 @@ import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
 import com.example.chessdotnet.exception.UserNotInRoomException;
 import com.example.chessdotnet.repository.ChessGameRepository;
+import com.example.chessdotnet.service.chessGameSession.ChessGameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -190,28 +189,30 @@ public class RoomService {
      * 게임을 시작하고 WebSocket을 통해 알림을 전송합니다.
      * 게임 시작과 함께 자동으로 관전이 가능하도록 설정됩니다.
      *
-     * @param roomId 게임을 시작할 방의 ID
-     * @return 업데이트된 Room의 DTO
+     * @param request 게임을 시작 요청 대한 정보 request body
+     * @return 게임 시작한 Room의 DTO
      * @throws RoomNotFoundException 방을 찾을 수 없을 때 발생
-     * @throws IllegalStateException 방이 가득 차지 않았을 때 발생
+     * @throws IllegalStateException 게임을 시작할 수 없을 때 발생
      */
     @Transactional
-    public RoomDTO startGame(Long roomId) {
-        Room room = roomRepository.findById(roomId)
+    public RoomDTO startGame(StartGameRequest request) {
+        Room room = roomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new RoomNotFoundException("Room not found"));
 
-        if (room.getPlayersCount() != 2) {
-            throw new IllegalStateException("Cannot start game: waiting for another player");
+        if (room.getJoinedPlayer() == null) {
+            throw new IllegalStateException("Cannot start game: need to wait for another player");
         }
 
-        // 게임 시작과 함께 자동으로 관전 가능하도록 설정
-        room.setCanJoinAsSpectator(true);
+        if (room.getHostPlayer().getId() != request.getUserId() &&
+            room.getJoinedPlayer().getId() != request.getUserId()) {
+            throw new IllegalStateException("Cannot start game: startGame request must be send by any player");
+        }
 
         // 체스 게임 생성
-        ChessGame game = chessGameService.createGame(roomId);
+        ChessGame game = chessGameService.createGame(request.getRoomId());
 
         Room updatedRoom = roomRepository.save(room);
-        RoomDTO roomDTO = updatedRoom.toDTO();
+        RoomDTO roomDTO = buildRoomDTOFromEntity(updatedRoom);
 
         // 게임 시작 알림 전송
         webSocketService.notifyRoomStatusChanged(
@@ -219,7 +220,7 @@ public class RoomService {
                 RoomStatusMessage.MessageType.GAME_STARTED
         );
 
-        log.info("Game started - Room ID: {}, Spectating enabled", roomId);
+        log.info("Game started - Room ID: {}", request.getRoomId());
         return roomDTO;
     }
 
