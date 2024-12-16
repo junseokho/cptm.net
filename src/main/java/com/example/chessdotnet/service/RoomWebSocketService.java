@@ -1,6 +1,6 @@
 package com.example.chessdotnet.service;
 
-import com.example.chessdotnet.dto.RoomDTO;
+import com.example.chessdotnet.dto.Room.RoomDTO;
 import com.example.chessdotnet.dto.RoomStatusMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
