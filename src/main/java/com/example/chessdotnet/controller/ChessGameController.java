@@ -58,12 +58,15 @@ public class ChessGameController {
             // 응답 생성
             Map<String, Object> response = createMoveResponse(moveSuccess, moveDTO, gameStatus, gameSession);
 
+            // 게임 ID 조회
+            Long gameId = gameSession.getGameId();
+
             // 결과 브로드캐스트
-            broadcastGameState(sessionId, response);
+            broadcastGameState(gameId, response);
 
             // 게임 종료 처리
             if (isGameEnded(gameStatus)) {
-                handleGameEnd(sessionId, gameStatus);
+                handleGameEnd(gameId, gameStatus);
             }
 
         } catch (IllegalMoveException | InvalidTurnException e) {
@@ -84,13 +87,17 @@ public class ChessGameController {
         String sessionId = headerAccessor.getSessionId();
         log.info("Resign request received - Session ID: {}, User ID: {}", sessionId, userId);
 
+        
         try {
             ChessGameSession gameSession = chessGameService.getChessGameSession(sessionId);
             boolean resignSuccess = chessGameService.doResign(sessionId, userId);
 
+            // 게임 ID 조회
+            Long gameId = gameSession.getGameId();
+
             if (resignSuccess) {
                 Map<String, Object> response = createResignResponse(gameSession, userId);
-                broadcastGameState(sessionId, response);
+                broadcastGameState(gameId, response);
             }
         } catch (Exception e) {
             handleResignError(sessionId, e);
@@ -149,16 +156,16 @@ public class ChessGameController {
     /**
      * 게임 상태를 모든 참여자에게 브로드캐스트합니다.
      */
-    private void broadcastGameState(String sessionId, Map<String, Object> response) {
-        messagingTemplate.convertAndSend("/topic/game/" + sessionId, response);
+    private void broadcastGameState(Long gameId, Map<String, Object> response) {
+        messagingTemplate.convertAndSend("/topic/game/" + gameId.toString(), response);
     }
 
     /**
      * 게임 종료를 처리합니다.
      */
-    private void handleGameEnd(String sessionId, ChessGame.GameStatus gameStatus) {
+    private void handleGameEnd(Long gameId, ChessGame.GameStatus gameStatus) {
         messagingTemplate.convertAndSend(
-                "/topic/game/" + sessionId + "/end",
+                "/topic/game/" + gameId.toString() + "/end",
                 Map.of("status", gameStatus)
         );
     }
