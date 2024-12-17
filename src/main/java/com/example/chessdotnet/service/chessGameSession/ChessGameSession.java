@@ -1,11 +1,13 @@
 package com.example.chessdotnet.service.chessGameSession;
 
 import com.example.chessdotnet.entity.ChessGame;
+import com.example.chessdotnet.entity.ChessGamePos;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 /**
  * 체스 게임 세션을 관리하는 클래스입니다.
@@ -98,7 +100,31 @@ public class ChessGameSession {
      */
     public ChessGameSession(ChessGame chessGameRecord, long gameId, long[] userIds, TimeControl timeControl) {
         this(gameId, userIds, timeControl);
-        // TODO: 기존 게임 상태 복원 로직 구현
+
+        // 저장된 이동 기록으로 체스보드 상태 복원
+        List<ChessGamePos> moveRecords = chessGameRecord.getMoveRecords();
+
+        for (ChessGamePos movePos : moveRecords) {
+            // ChessGamePos를 ChessboardMove로 변환
+            ChessboardMove move = new ChessboardMove(
+                new ChessboardPos(movePos.getStartRow(), movePos.getStartCol()),
+                new ChessboardPos(movePos.getEndRow(), movePos.getEndCol())
+            );
+
+            // 프로모션 정보 처리
+            if (movePos.isPromotion()) {
+                move.setPromotionToWhat(Piece.PieceType.valueOf(movePos.getPromotedTo().name()));
+            }
+
+            // 체스보드에 이동 적용
+            this.chessboard.movePiece(move);
+        }
+
+        // 현재 턴 설정
+        this.chessboard.turnNow = (moveRecords.size() % 2 == 0) ? Piece.PieceColor.WHITE : Piece.PieceColor.BLACK;
+
+        // 필요한 경우 추가적인 게임 상태 복원
+        // 예: 플레이어들의 남은 시간 복원
     }
 
     /**
