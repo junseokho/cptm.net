@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import '../assets/ChessBoard.css';
 import initialBoard from '../components/initialChessBoard.js';
 import {Bishop, Knight, Queen, Rook} from "./Piece.jsx";
+import {sendMove} from "../apis/SendMove.js";
 
 
 /**
@@ -109,6 +110,26 @@ const ChessBoard = () => {
 
             // 기존 위치 비우기
             newBoard[position.row][position.col] = null;
+
+            // 이동 정보 DTO 생성
+            const moveDTO = {
+                piece: {
+                    name: piece.name.toLowerCase(),
+                    color: piece.color
+                },
+                startPosition: position,
+                endPosition: targetPosition,
+                specialMoves: {
+                    takePiece: !!chessboard.board[targetPosition.row][targetPosition.col],
+                    promotion: move.type === 'promotion',
+                    promotionToWhat: move.promotionToWhat || null,
+                    isEnpassant: move.type === 'enPassant',
+                    castling: move.type === 'castling' ? { isKingSide: move.col === 6 } : null
+                }
+            };
+
+            // WebSocket으로 이동 정보 전송
+            sendMove(moveDTO);
 
             // 상태 업데이트
             setChessboard((prevChessboard) => ({
