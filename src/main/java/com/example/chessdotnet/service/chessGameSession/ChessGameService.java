@@ -97,6 +97,7 @@ public class ChessGameService {
      * @throws IllegalMoveException 체스 규칙에 어긋나는 이동을 시도한 경우
      * @author 전종영
      */
+    @Transactional
     public boolean doMove(String sessionId, ChessMoveDTO moveDTO) {
         try {
             ChessGameSession session = getValidSession(sessionId);

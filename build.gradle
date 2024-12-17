@@ -42,7 +42,14 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'com.h2database:h2'  // H2 Database 추가
+    // WebSocket 테스트를 위한 추가 의존성
+    testImplementation 'org.springframework.boot:spring-boot-starter-websocket'
+    testImplementation 'org.springframework:spring-messaging'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
 
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
