@@ -6,7 +6,7 @@
  */
 
 import {useEffect, useState} from 'react'
-import { MatchAPI } from '../apis/MatchAPI.js'
+import { RoomAPI } from '../apis/RoomAPI.js'
 import '../assets/css/lobby.scss'
 
 
@@ -51,14 +51,25 @@ function MatchList() {
     const [matchListUpdateCount, setMatchListUpdateCount] = useState(0);
     console.log(matchListUpdateCount);
     useEffect(() => {
-        MatchAPI.get_available_matches().then(function(response) {
+        RoomAPI.get_playable_rooms().then(function(response) {
             const newAvailableMatches = response.data.map((e) => {
                 // todo 상수로 넣는 값들은 임시값
                 return {
-                    matchTitle: e.title,
-                    hostRating: 1000,
-                    timeControl: '10+5',
-                    matchId: e.id
+                    id: e.id,
+                    hostId: e.hostId,
+                    hostUsername: e.hostUsername,
+                    hostRating: e.hostRating,
+                    joinedId: e.joinedId,
+                    joinedUsername: e.joinedUsername,
+                    joinedRating: e.joinedRating,
+                    canJoinAsPlayer: e.canJoinAsPlayer,
+                    canJoinAsSpectator: e.canJoinAsSpectator,
+                    isGameDone: e.isGameDone,
+                    timeControl: e.timeControlMin.toString()
+                        + ':'
+                        + e.timeControlSec.toString()
+                        + '+'
+                        + e.timeControlInc.toString()
                 }});
             setAvailableMatches(newAvailableMatches);
         }).catch(function (error) {
@@ -73,7 +84,7 @@ function MatchList() {
 
 
     const match_cards = availableMatches.map((e) => (
-        <MatchListCard matchTitle={e.matchTitle}
+        <MatchListCard matchTitle={e.hostUsername}
                        hostRating={e.hostRating}
                        timeControl={e.timeControl}
                        matchId={e.matchId}
@@ -109,7 +120,7 @@ function MenuRight() {
         <>
             <div className="menu">
                 <p onClick={
-                    () => MatchAPI.create_new_match("host name", "1")
+                    () => RoomAPI.createRoom("host name", "1")
                 }>
                     Create a Game
                 </p>
