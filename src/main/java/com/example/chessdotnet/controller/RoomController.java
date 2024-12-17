@@ -126,17 +126,17 @@ public class RoomController {
      * @param request 방을 나가려는 사용자의 정보
      * @return 업데이트된 방 정보 또는 방이 삭제되었을 경우 204 No Content
      */
-    @PostMapping("/{roomId}/leave")
-    public ResponseEntity<RoomDTO> leaveRoom(@PathVariable Long roomId, @Valid @RequestBody LeaveRoomRequest request) {
-        log.info("방 나가기 요청. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
-        RoomDTO room = roomService.leaveRoom(roomId, request.getUserId());
-        if (room == null) {
-            log.info("방 삭제됨. 방 ID: {}", roomId);
-            return ResponseEntity.noContent().build();
-        }
-        log.info("방 나가기 완료. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
-        return ResponseEntity.ok(room);
-    }
+//    @PostMapping("/{roomId}/leave")
+//    public ResponseEntity<RoomDTO> leaveRoom(@PathVariable Long roomId, @Valid @RequestBody LeaveRoomRequest request) {
+//        log.info("방 나가기 요청. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
+//        RoomDTO room = roomService.leaveRoom(roomId, request.getUserId());
+//        if (room == null) {
+//            log.info("방 삭제됨. 방 ID: {}", roomId);
+//            return ResponseEntity.noContent().build();
+//        }
+//        log.info("방 나가기 완료. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
+//        return ResponseEntity.ok(room);
+//    }
 
     /**
      * 방을 삭제하는 요청을 처리합니다.

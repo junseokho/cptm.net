@@ -12,7 +12,7 @@ import lombok.Setter;
  * @author 전종영
  */
 @Entity
-@Table(name = "rooms")
+@Table(name = "room")
 @Getter
 @Setter
 public class Room {
