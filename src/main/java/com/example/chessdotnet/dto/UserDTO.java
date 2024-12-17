@@ -20,4 +20,7 @@ public class UserDTO {
 
     /** 사용자가 참여한 방의 수 */
     private int joinedRoomsCount;
+
+    /** 사용자의 레이팅 점수 */
+    private int rating;
 }

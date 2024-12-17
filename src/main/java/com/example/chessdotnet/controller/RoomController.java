@@ -1,12 +1,10 @@
 package com.example.chessdotnet.controller;
 
-import com.example.chessdotnet.dto.CreateRoomRequest;
-import com.example.chessdotnet.dto.JoinRoomRequest;
-import com.example.chessdotnet.dto.LeaveRoomRequest;
-import com.example.chessdotnet.dto.RoomDTO;
+import com.example.chessdotnet.dto.Room.*;
 import com.example.chessdotnet.exception.RoomNotFoundException;
 import com.example.chessdotnet.exception.UserNotFoundException;
 import com.example.chessdotnet.exception.UserNotInRoomException;
+import com.example.chessdotnet.service.chessGameSession.ChessGameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +18,10 @@ import java.util.List;
 
 /**
  * 방 관련 HTTP 요청을 처리하는 컨트롤러 클래스입니다.
+ *
  * @author 전종영
+ * @version 1.2
+ * @since 2024-11-07
  */
 @RestController
 @RequestMapping("/api/rooms")
@@ -38,25 +39,46 @@ public class RoomController {
      */
     @PostMapping("/create")
     public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody CreateRoomRequest request) {
-        log.info("방 생성 요청: {}", request.getTitle());
-        RoomDTO room = roomService.createRoom(request.getTitle(), request.getHostId());
-        log.info("방 생성 완료. 방 ID: {}", room.getId());
-        return ResponseEntity.ok(room);
+        RoomDTO createdRoom;
+        try {
+            createdRoom = roomService.createRoom(request);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        log.info("방 생성 완료. 방 ID: {}", createdRoom.getId());
+        return ResponseEntity.ok(createdRoom);
     }
 
     /**
      * 사용자가 특정 방에 참여합니다.
      *
-     * @param roomId 참여할 방의 ID
-     * @param request 방 참여 요청 정보
+     * @param request 방 참여 요청 request body
      * @return 업데이트된 방 정보
      */
-    @PostMapping("/{roomId}/join")
-    public ResponseEntity<RoomDTO> joinRoom(@PathVariable Long roomId, @Valid @RequestBody JoinRoomRequest request) {
-        log.info("방 참여 요청. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
-        RoomDTO room = roomService.joinRoom(roomId, request.getUserId());
-        log.info("방 참여 완료. 방 ID: {}, 사용자 ID: {}", roomId, request.getUserId());
-        return ResponseEntity.ok(room);
+    @PostMapping("/join")
+    public ResponseEntity<RoomDTO> joinRoom(@Valid @RequestBody JoinRoomRequest request) {
+        try {
+            RoomDTO room = roomService.joinRoom(request);
+            return ResponseEntity.ok(room);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * 사용자가 요청한 방에 대한 관전을 요청합니다.
+     *
+     * @param request 방 관전 요청 request body
+     * @return 관전하고자 하는 `Room` 의 정보 DTO
+     */
+    @PostMapping("/spectate")
+    public ResponseEntity<RoomDTO> spectateRoom(@Valid @RequestBody SpectateRoomRequest request) {
+        try {
+            RoomDTO room = roomService.spectateRoom(request);
+            return ResponseEntity.ok(room);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -64,12 +86,37 @@ public class RoomController {
      *
      * @return 사용 가능한 방 목록
      */
-    @GetMapping("/available")
-    public ResponseEntity<List<RoomDTO>> getAvailableRooms() {
-        log.info("사용 가능한 방 목록 요청");
-        List<RoomDTO> rooms = roomService.getAvailableRooms();
-        log.info("사용 가능한 방 {} 개 조회됨", rooms.size());
+    @GetMapping("/playable")
+    public ResponseEntity<List<RoomDTO>> getPlayableRooms() {
+        List<RoomDTO> rooms = roomService.getPlayableRooms();
         return ResponseEntity.ok(rooms);
+    }
+
+    /**
+     * 관전자로 참여 가능한 모든 방의 목록을 조회합니다.
+     *
+     * @return 관전 가능한 방 목록
+     */
+    @GetMapping("/spectatable")
+    public ResponseEntity<List<RoomDTO>> getSpectatableRooms() {
+        List<RoomDTO> rooms = roomService.getSpectateableRooms();
+        return ResponseEntity.ok(rooms);
+    }
+
+    /**
+     * 게임을 시작하고 체스 기물을 초기 배치합니다.
+     *
+     * @param request 게임을 시작 요청 대한 정보 request body
+     * @return 업데이트된 방 정보
+     */
+    @PostMapping("/startGame")
+    public ResponseEntity<RoomDTO> startGame(@Valid @RequestBody StartGameRequest request) {
+        try {
+            RoomDTO room = roomService.startGame(request);
+            return ResponseEntity.ok(room);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -101,23 +148,12 @@ public class RoomController {
     @DeleteMapping("/{roomId}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId, @RequestParam Long userId) {
         log.info("방 삭제 요청. 방 ID: {}, 사용자 ID: {}", roomId, userId);
-        roomService.deleteRoom(roomId, userId);
-        log.info("방 삭제 완료. 방 ID: {}", roomId);
-        return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * 게임을 시작하고 체스 기물 색상을 설정합니다.
-     *
-     * @param roomId 게임을 시작할 방의 ID
-     * @return 업데이트된 방 정보
-     */
-    @PostMapping("/{roomId}/start")
-    public ResponseEntity<RoomDTO> startGame(@PathVariable Long roomId) {
-        log.info("게임 시작 요청. 방 ID: {}", roomId);
-        RoomDTO room = roomService.startGame(roomId);
-        log.info("게임 시작 완료. 방 ID: {}, 방장 색상: {}", roomId, room.getIsHostWhitePlayer() ? "백" : "흑");
-        return ResponseEntity.ok(room);
+        try {
+            roomService.deleteRoom(roomId, userId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -176,8 +212,7 @@ public class RoomController {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        return ResponseEntity.badRequest().body("Invalid input: " + ex.getBindingResult().getAllErrors().getFirst().getDefaultMessage());
+        return ResponseEntity.badRequest().body("Invalid input: " +
+                ex.getBindingResult().getAllErrors().getFirst().getDefaultMessage());
     }
-
-
 }

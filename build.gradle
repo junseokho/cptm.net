@@ -29,7 +29,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'mysql:mysql-connector-java:8.0.33'
+    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -41,49 +44,12 @@ dependencies {
     testImplementation 'com.h2database:h2'  // H2 Database 추가
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     //runtimeOnly 'com.h2database:h2' // 개발/테스트용
     runtimeOnly 'mysql:mysql-connector-java:8.0.33'
 }
-//
-//def webappDir = "$projectDir/src/main/frontend"
-//
-//sourceSets {
-//    main {
-//        resources {
-//            srcDirs = ["$webappDir/build", "$projectDir/src/main/resources"]
-//        }
-//    }
-//}
-//
-//processResources {
-//    dependsOn "buildReact"
-//}
-//
-//task buildReact(type: Exec) {
-//    dependsOn "installReact"
-//    workingDir "$webappDir"
-//    inputs.dir "$webappDir"
-//    group = BasePlugin.BUILD_GROUP
-//    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-//        commandLine "npm.cmd", "run-script", "build"
-//    } else {
-//        commandLine "npm", "run-script", "build"
-//    }
-//}
-//
-//task installReact(type: Exec) {
-//    workingDir "$webappDir"
-//    inputs.dir "$webappDir"
-//    group = BasePlugin.BUILD_GROUP
-//    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-//        commandLine "npm.cmd", "audit", "fix"
-//        commandLine 'npm.cmd', 'install'
-//    } else {
-//        commandLine "npm", "audit", "fix"
-//        commandLine 'npm', 'install'
-//    }
-//}
 
 tasks.named('test') {
     useJUnitPlatform()

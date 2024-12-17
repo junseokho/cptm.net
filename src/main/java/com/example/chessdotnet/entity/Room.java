@@ -1,12 +1,9 @@
 package com.example.chessdotnet.entity;
 
-import com.example.chessdotnet.dto.RoomDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * 체스 게임 방을 나타내는 엔티티 클래스입니다.
@@ -14,79 +11,44 @@ import java.util.Set;
  *
  * @author 전종영
  */
-@Entity // JPA 엔티티임을 나타냄
-@Table(name = "rooms") // 데이터베이스 테이블 이름 지정
-@Getter @Setter // Lombok을 사용하여 getter와 setter 메소드 자동 생성
+@Entity
+@Table(name = "rooms")
+@Getter
+@Setter
 public class Room {
-    /** 방의 고유 식별자 */
-    @Id // 기본 키 필드
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 생성 전략
+    /**
+     * The unique identifier for a room.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** 방 제목 */
-    @Column(nullable = false)
-    private String title; // 방 제목
-
-    /** 최대 플레이어 수, 기본값은 2 */
-    @Column(nullable = false)
-    private int maxPlayers = 2; // 최대 플레이어 수, 기본값 2
+    /**
+     * The player who created the room.
+     */
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_player", referencedColumnName = "id")
+    private User hostPlayer;
 
     /**
-     * 방장의 체스 기물 색상 (true: 백, false: 흑)
-     * null일 경우 아직 게임이 시작되지 않았음을 의미합니다.
+     * The player who joined the room. Can be null if no player has joined yet.
      */
-    @Column(nullable = true)
-    private Boolean isHostWhitePlayer;
-
-    /** 현재 방에 참여한 플레이어 수, 기본값은 1 (방장) */
-    @Column(nullable = false)
-    private int playersCount = 1; // 현재 플레이어 수, 기본값 1
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "joined_player", referencedColumnName = "id")
+    private User joinedPlayer;
 
     /**
-     * 게임 준비 상태
-     * true일 경우 게임을 시작할 수 있는 상태입니다.
+     * The time control in minutes for the chess game.
      */
-    @Column(nullable = false)
-    private boolean isGameStarted = false; // 게임 시작 여부
-
-    /** 방을 생성한 사용자 */
-    @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계, 지연 로딩
-    @JoinColumn(name = "host_id", nullable = false)
-    private User host; // 방 생성자
-
-    /** 방에 참여한 플레이어들 */
-    @ManyToMany(fetch = FetchType.LAZY) // 다대다 관계, 지연 로딩
-    @JoinTable(
-            name = "room_players", // 연결 테이블 이름
-            joinColumns = @JoinColumn(name = "room_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<User> players = new HashSet<>(); // 방에 참여한 플레이어들
+    private int timeControlMin;
 
     /**
-     * 방 ID에 따라 방장의 체스 기물 색상을 설정합니다.
+     * The time control in seconds for the chess game.
      */
-    public void setIsHostWhitePlayer() {
-        if (this.id != null) {
-            this.isHostWhitePlayer = this.id % 2 == 0;
-        }
-    }
+    private int timeControlSec;
 
     /**
-     * Room 엔티티를 RoomDTO로 변환합니다.
-     *
-     * @return 변환된 RoomDTO 객체
+     * The increment in seconds for each move in the chess game.
      */
-    public RoomDTO toDTO() {
-        RoomDTO dto = new RoomDTO();
-        dto.setId(this.id);
-        dto.setTitle(this.title);
-        dto.setHostId(this.host.getId());
-        dto.setHostUsername(this.host.getUsername());
-        dto.setPlayersCount(this.playersCount);
-        dto.setMaxPlayers(this.maxPlayers);
-        dto.setGameStarted(this.isGameStarted);
-        dto.setIsHostWhitePlayer(this.isHostWhitePlayer);
-        return dto;
-    }
+    private int timeControlInc;
 }
