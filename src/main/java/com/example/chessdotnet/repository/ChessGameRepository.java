@@ -14,12 +14,5 @@ import java.util.Optional;
  */
 @Repository
 public interface ChessGameRepository extends JpaRepository<ChessGame, Long> {
-    /**
-     * 특정 방의 진행 중인 게임을 찾습니다.
-     *
-     * @param roomId 방 ID
-     * @param status 게임 상태
-     * @return 해당 방의 진행 중인 게임 (Optional)
-     */
-    Optional<ChessGame> findByRoom_IdAndStatus(Long roomId, ChessGame.GameStatus status);
+
 }

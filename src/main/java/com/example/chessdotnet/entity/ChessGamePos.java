@@ -13,7 +13,7 @@ import lombok.Setter;
  * @since 2024-11-25
  */
 @Entity
-@Table(name = "chess_game_positions")
+@Table(name = "chess_game_position")
 @Getter @Setter
 public class ChessGamePos {
 

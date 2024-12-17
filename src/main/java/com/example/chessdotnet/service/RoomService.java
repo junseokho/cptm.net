@@ -234,41 +234,41 @@ public class RoomService {
      * @throws UserNotFoundException 지정된 ID의 사용자를 찾을 수 없는 경우
      * @throws UserNotInRoomException 사용자가 해당 방에 없는 경우
      */
-    @Transactional
-    public RoomDTO leaveRoom(Long roomId, Long userId) {
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RoomNotFoundException("Room not found"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        boolean isHost = user.getId().equals(room.getHost().getId());
-        boolean isJoinedPlayer = room.getJoinedPlayer() != null &&
-                user.getId().equals(room.getJoinedPlayer().getId());
-
-        if (!isHost && !isJoinedPlayer) {
-            throw new UserNotInRoomException("User is not in the room");
-        }
-
-        if (isJoinedPlayer) {
-            room.setJoinedPlayer(null);
-            room.setPlayersCount(1);
-        } else if (isHost) {
-            if (room.getJoinedPlayer() == null) {
-                roomRepository.delete(room);
-                log.info("Room deleted - ID: {}", roomId);
-                return null;
-            } else {
-                // 참여자가 있는 경우 참여자를 방장으로 승격
-                room.setHost(room.getJoinedPlayer());
-                room.setJoinedPlayer(null);
-                room.setPlayersCount(1);
-            }
-        }
-
-        Room updatedRoom = roomRepository.save(room);
-        log.info("Player left - Room ID: {}, Player: {}", roomId, user.getUsername());
-        return updatedRoom.toDTO();
-    }
+//    @Transactional
+//    public RoomDTO leaveRoom(Long roomId, Long userId) {
+//        Room room = roomRepository.findById(roomId)
+//                .orElseThrow(() -> new RoomNotFoundException("Room not found"));
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new UserNotFoundException("User not found"));
+//
+//        boolean isHost = user.getId().equals(room.getHost().getId());
+//        boolean isJoinedPlayer = room.getJoinedPlayer() != null &&
+//                user.getId().equals(room.getJoinedPlayer().getId());
+//
+//        if (!isHost && !isJoinedPlayer) {
+//            throw new UserNotInRoomException("User is not in the room");
+//        }
+//
+//        if (isJoinedPlayer) {
+//            room.setJoinedPlayer(null);
+//            room.setPlayersCount(1);
+//        } else if (isHost) {
+//            if (room.getJoinedPlayer() == null) {
+//                roomRepository.delete(room);
+//                log.info("Room deleted - ID: {}", roomId);
+//                return null;
+//            } else {
+//                // 참여자가 있는 경우 참여자를 방장으로 승격
+//                room.setHost(room.getJoinedPlayer());
+//                room.setJoinedPlayer(null);
+//                room.setPlayersCount(1);
+//            }
+//        }
+//
+//        Room updatedRoom = roomRepository.save(room);
+//        log.info("Player left - Room ID: {}, Player: {}", roomId, user.getUsername());
+//        return updatedRoom.toDTO();
+//    }
 
     /**
      * 방을 삭제하는 기능을 처리합니다.

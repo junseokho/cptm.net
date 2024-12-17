@@ -17,7 +17,7 @@ import java.util.Set;
  * @author 전종영
  */
 @Entity // JPA 엔티티임을 나타냄
-@Table(name = "users") // 데이터베이스 테이블 이름 지정
+@Table(name = "user") // 데이터베이스 테이블 이름 지정
 @Getter @Setter // Lombok을 사용하여 getter와 setter 메소드 자동 생성
 public class User {
     /** 사용자의 고유 식별자 */

@@ -45,8 +45,8 @@ public class RoomWebSocketService {
             String destination = "/topic/rooms/" + room.getId();
             messagingTemplate.convertAndSend(destination, message);
 
-            log.info("Room status notification sent - Room ID: {}, Type: {}, Players: {}",
-                    room.getId(), type, room.getPlayersCount());
+//            log.info("Room status notification sent - Room ID: {}, Type: {}, Players: {}",
+//                    room.getId(), type, room.getPlayersCount());
         } catch (Exception e) {
             // 메시지 전송 실패 시 로그만 남기고 계속 진행
             log.error("Failed to send room status notification - Room ID: {}, Type: {}, Error: {}",

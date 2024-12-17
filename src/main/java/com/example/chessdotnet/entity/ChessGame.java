@@ -16,7 +16,7 @@ import java.util.Date;
  * @since 2024-11-25
  */
 @Entity
-@Table(name = "chess_games")
+@Table(name = "chess_game")
 @Getter
 @Setter
 public class ChessGame {
