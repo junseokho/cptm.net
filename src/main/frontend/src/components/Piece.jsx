@@ -1,356 +1,498 @@
-import React from 'react';
+import ChessBoard from "./ChessBoard.jsx";
 
+
+/**
+ * Represents a chess piece.
+ * @class
+ */
 export class Piece {
-    constructor(name, position, color, image) {
+    /**
+     * Creates a chess piece.
+     * @param {string} name The name of the piece.
+     * @param {Object} position The current position of the piece.
+     * @param {number} position.row The row position.
+     * @param {number} position.col The column position.
+     * @param {string} color The color of the piece ('white' or 'black').
+     * @param {string} image The image URL for the piece.
+     * @param {boolean} hasMoved true if piece hasn't moved or is not initial position
+     */
+    constructor(name, position, color, image, hasMoved = false) {
         this.name = name;
         this.position = position;
         this.color = color;
         this.image = image;
+        this.hasMoved = hasMoved;
     }
 
+    /**
+     * Checks if a move to the given position is valid.
+     * @param {Object} position - The target position.
+     * @param {number} position.row - The row to move to.
+     * @param {number} position.col - The column to move to.
+     * @param {Array} board - The current board state.
+     * @returns {boolean} - Returns true if the move is valid.
+     */
     isValidMove(position, board) {
-        if (position.x < 0 || position.x > 7 || position.y < 0 || position.y > 7) return false;
-        const pieceAtDestination = board[position.y][position.x];
-        return !(pieceAtDestination && (pieceAtDestination.color === this.color));
+        if (position.row < 0 || position.row > 7 || position.col < 0 || position.col > 7) return false;
+        const pieceAtDestination = board[position.row][position.col];
+        return !(pieceAtDestination && pieceAtDestination.color === this.color);
 
+
+    }
+
+    /**
+     * Gets valid moves along specified directions.
+     * @param {Array} directions - Array of direction objects.
+     * @param {Array} board - The current state of the board.
+     * @returns {Array} - A list of valid move positions.
+     */
+    get_valid_moves_on_way(directions, board) {
+        let moves = [];
+
+        for (const direction of directions) {
+            let row = this.position.row;
+            let col = this.position.col;
+
+            while (true) {
+                row += direction.row;
+                col += direction.col;
+                const newPosition = { row, col };
+
+                if (!this.isValidMove(newPosition, board)) break;
+
+                moves.push(newPosition);
+
+                const pieceAtNewPosition = board[row][col];
+                if (pieceAtNewPosition) {
+                    if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
+                    break;
+                }
+            }
+        }
+        return filterValidMoves(moves, board, this, ChessBoard);
     }
 }
 
-//룩의 이동 범위 로직
+/**
+ * Represents a Rook chess piece.
+ * @extends Piece
+ */
 export class Rook extends Piece {
+    /**
+     * Gets the available moves for the Rook.
+     * @param {Array} board - The current state of the board.
+     * @returns {Array} - A list of valid move positions.
+     */
     getAvailableMoves(board) {
-        let moves = [];
-
-        // 오른쪽으로 이동
-        for (let x = this.position.x + 1; x < 8; x++) {
-            const newPosition = { x, y: this.position.y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition); // 적 기물이면 그 칸에 멈춤
-                break; // 기물이 있으면 이후 칸으로는 이동 불가
-            }
-        }
-
-        // 왼쪽으로 이동
-        for (let x = this.position.x - 1; x >= 0; x--) {
-            const newPosition = { x, y: this.position.y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 위로 이동
-        for (let y = this.position.y - 1; y >= 0; y--) {
-            const newPosition = { x: this.position.x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 아래로 이동
-        for (let y = this.position.y + 1; y < 8; y++) {
-            const newPosition = { x: this.position.x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        return moves;
+        const directions = [
+            { row: 1, col: 0 },
+            { row: -1, col: 0 },
+            { row: 0, col: 1 },
+            { row: 0, col: -1 }
+        ];
+        return filterValidMoves(this.get_valid_moves_on_way(directions, board), board, this, ChessBoard);
     }
 }
 
-//비숍의 이동 범위 로직
+/**
+ * Represents a Bishop chess piece.
+ * @extends Piece
+ */
 export class Bishop extends Piece {
+    /**
+     * Gets the available moves for the Bishop.
+     * @param {Array} board - The current state of the board.
+     * @returns {Array} - A list of valid move positions.
+     */
     getAvailableMoves(board) {
-        let moves = [];
-
-        // 오른쪽 위 대각선 이동
-        for (let x = this.position.x + 1, y = this.position.y - 1; x < 8 && y >= 0; x++, y--) {
-            const newPosition = { x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 오른쪽 아래 대각선 이동
-        for (let x = this.position.x + 1, y = this.position.y + 1; x < 8 && y < 8; x++, y++) {
-            const newPosition = { x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 왼쪽 위 대각선 이동
-        for (let x = this.position.x - 1, y = this.position.y - 1; x >= 0 && y >= 0; x--, y--) {
-            const newPosition = { x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 왼쪽 아래 대각선 이동
-        for (let x = this.position.x - 1, y = this.position.y + 1; x >= 0 && y < 8; x--, y++) {
-            const newPosition = { x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        return moves;
+        const directions = [
+            { row: 1, col: 1 },  // down-right
+            { row: 1, col: -1 }, // down-left
+            { row: -1, col: 1 }, // up-right
+            { row: -1, col: -1 } // up-left
+        ];
+        return filterValidMoves(this.get_valid_moves_on_way(directions, board), board, this, ChessBoard);
     }
 }
 
-//나이트의 이동 범위 로직
+/**
+ * Represents a Queen chess piece.
+ * @extends Piece
+ */
+export class Queen extends Piece {
+    /**
+     * Gets the available moves for the Queen.
+     * @param {Array} board - The current state of the board.
+     * @returns {Array} - A list of valid move positions.
+     */
+    getAvailableMoves(board) {
+        const directions = [
+            { row: 1, col: 0 },  // right
+            { row: -1, col: 0 }, // left
+            { row: 0, col: 1 },  // down
+            { row: 0, col: -1 }, // up
+            { row: 1, col: 1 },  // down-right
+            { row: 1, col: -1 }, // down-left
+            { row: -1, col: 1 }, // up-right
+            { row: -1, col: -1 } // up-left
+        ];
+        return filterValidMoves(this.get_valid_moves_on_way(directions, board), board, this, ChessBoard);
+    }
+}
+
+/**
+ * Represents a Knight chess piece.
+ * @extends Piece
+ */
 export class Knight extends Piece {
+    /**
+     * Gets the available moves for the Knight.
+     * @param {Array} board - The current state of the board.
+     * @returns {Array} - A list of valid move positions.
+     */
     getAvailableMoves(board) {
         let moves = [];
         const potentialMoves = [
-            { x: this.position.x + 2, y: this.position.y + 1 },
-            { x: this.position.x + 2, y: this.position.y - 1 },
-            { x: this.position.x - 2, y: this.position.y + 1 },
-            { x: this.position.x - 2, y: this.position.y - 1 },
-            { x: this.position.x + 1, y: this.position.y + 2 },
-            { x: this.position.x + 1, y: this.position.y - 2 },
-            { x: this.position.x - 1, y: this.position.y + 2 },
-            { x: this.position.x - 1, y: this.position.y - 2 }
+            { row: this.position.row + 2, col: this.position.col + 1 },
+            { row: this.position.row + 2, col: this.position.col - 1 },
+            { row: this.position.row - 2, col: this.position.col + 1 },
+            { row: this.position.row - 2, col: this.position.col - 1 },
+            { row: this.position.row + 1, col: this.position.col + 2 },
+            { row: this.position.row + 1, col: this.position.col - 2 },
+            { row: this.position.row - 1, col: this.position.col + 2 },
+            { row: this.position.row - 1, col: this.position.col - 2 }
         ];
 
-        // 각 가능한 이동 위치가 유효한지 확인
         for (const move of potentialMoves) {
             if (this.isValidMove(move, board)) {
                 moves.push(move);
             }
         }
 
-        return moves;
+        return filterValidMoves(moves, board, this, ChessBoard);
+
     }
 }
 
-//폰의 이동 범위 로직
+/**
+ * Represents a Pawn chess piece.
+ * @extends Piece
+ */
 export class Pawn extends Piece {
-    getAvailableMoves(board) {
+    /**
+     * Gets the available moves for the Pawn, including en passant and promotion.
+     * @param {Array} board - The current state of the board.
+     * @param {Object} Chessboard - 체스보드 상태 객체
+     * @returns {Array} - A list of valid move positions.
+     */
+    getAvailableMoves(board, Chessboard) {
         let moves = [];
-        const direction = this.color === 'white' ? -1 : 1; // 백은 위로, 흑은 아래로 이동
+        const { moveHistory } = Chessboard;
+        const direction = this.color === 'white' ? 1 : -1;
 
-        // 한 칸 전진
-        const oneStepForward = { x: this.position.x, y: this.position.y + direction };
-        if (this.isValidMove(oneStepForward, board) && !board[oneStepForward.y][oneStepForward.x]) {
-            moves.push(oneStepForward);
+        // 1칸 전진
+        const oneStepForward = { row: this.position.row + direction, col: this.position.col };
+        if (this.isValidMove(oneStepForward, board) && !board[oneStepForward.row]?.[oneStepForward.col]) {
+            moves.push({
+                ...oneStepForward,
+                type: (oneStepForward.row === 0 || oneStepForward.row === 7) ? 'promotion' : undefined,
+            });
         }
 
-        // 첫 이동일 경우 두 칸 전진
-        const startingRow = this.color === 'white' ? 6 : 1;
-        const twoStepsForward = { x: this.position.x, y: this.position.y + 2 * direction };
-        if (this.position.y === startingRow && !board[oneStepForward.y][oneStepForward.x] && !board[twoStepsForward.y][twoStepsForward.x]) {
+        // 2칸 전진 (초기 위치에서만 가능)
+        const startingRow = this.color === 'white' ? 1 : 6;
+        const twoStepsForward = { row: this.position.row + 2 * direction, col: this.position.col };
+        if (this.position.row === startingRow &&
+            !board[oneStepForward.row]?.[oneStepForward.col] &&
+            !board[twoStepsForward.row]?.[twoStepsForward.col]
+        ) {
             moves.push(twoStepsForward);
         }
 
-        // 대각선 공격 (적 기물이 있는 경우만)
-        const leftDiagonal = { x: this.position.x - 1, y: this.position.y + direction };
-        const rightDiagonal = { x: this.position.x + 1, y: this.position.y + direction };
+        // 대각선 공격 및 앙파상
+        const leftDiagonal = { row: this.position.row + direction, col: this.position.col - 1 };
+        const rightDiagonal = { row: this.position.row + direction, col: this.position.col + 1 };
 
-        if (this.isValidMove(leftDiagonal, board)) {
-            const pieceAtLeftDiagonal = board[leftDiagonal.y]?.[leftDiagonal.x];
-            if (pieceAtLeftDiagonal && pieceAtLeftDiagonal.color !== this.color) {
-                moves.push(leftDiagonal);
-            }
-        }
+        // 앙파상 처리
+        if (moveHistory.length > 0) {
+            const lastMove = moveHistory[moveHistory.length - 1]; // 마지막 이동 기록 가져오기
+            const [start, end] = lastMove.split('-'); // 기보 형식: "e2-e4"
+            const startRow = parseInt(start[1])-1;
+            const startCol = start.charCodeAt(0) - 'a'.charCodeAt(0);
+            const endRow = parseInt(end[1])-1;
+            const endCol = end.charCodeAt(0) - 'a'.charCodeAt(0);
 
-        if (this.isValidMove(rightDiagonal, board)) {
-            const pieceAtRightDiagonal = board[rightDiagonal.y]?.[rightDiagonal.x];
-            if (pieceAtRightDiagonal && pieceAtRightDiagonal.color !== this.color) {
-                moves.push(rightDiagonal);
-            }
-        }
-
-        return moves;
-    }
-}
-
-//퀸 이동 범위 로직
-export class Queen extends Piece {
-    getAvailableMoves(board) {
-        let moves = [];
-
-        // 룩의 상하좌우 이동
-        // 오른쪽으로 이동
-        for (let x = this.position.x + 1; x < 8; x++) {
-            const newPosition = { x, y: this.position.y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 왼쪽으로 이동
-        for (let x = this.position.x - 1; x >= 0; x--) {
-            const newPosition = { x, y: this.position.y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 위로 이동
-        for (let y = this.position.y - 1; y >= 0; y--) {
-            const newPosition = { x: this.position.x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 아래로 이동
-        for (let y = this.position.y + 1; y < 8; y++) {
-            const newPosition = { x: this.position.x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 비숍의 대각선 이동
-        // 오른쪽 위 대각선
-        for (let x = this.position.x + 1, y = this.position.y - 1; x < 8 && y >= 0; x++, y--) {
-            const newPosition = { x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 오른쪽 아래 대각선
-        for (let x = this.position.x + 1, y = this.position.y + 1; x < 8 && y < 8; x++, y++) {
-            const newPosition = { x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 왼쪽 위 대각선
-        for (let x = this.position.x - 1, y = this.position.y - 1; x >= 0 && y >= 0; x--, y--) {
-            const newPosition = { x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        // 왼쪽 아래 대각선
-        for (let x = this.position.x - 1, y = this.position.y + 1; x >= 0 && y < 8; x--, y++) {
-            const newPosition = { x, y };
-            if (!this.isValidMove(newPosition, board)) break;
-            moves.push(newPosition);
-            const pieceAtNewPosition = board[newPosition.y][newPosition.x];
-            if (pieceAtNewPosition) {
-                if (pieceAtNewPosition.color !== this.color) moves.push(newPosition);
-                break;
-            }
-        }
-
-        return moves;
-    }
-}
-
-//킹 이동 범위 로직
-export class King extends Piece {
-    getAvailableMoves(board) {
-        let moves = [];
-        const potentialMoves = [
-            { x: this.position.x + 1, y: this.position.y },
-            { x: this.position.x - 1, y: this.position.y },
-            { x: this.position.x, y: this.position.y + 1 },
-            { x: this.position.x, y: this.position.y - 1 },
-            { x: this.position.x + 1, y: this.position.y + 1 },
-            { x: this.position.x + 1, y: this.position.y - 1 },
-            { x: this.position.x - 1, y: this.position.y + 1 },
-            { x: this.position.x - 1, y: this.position.y - 1 }
-        ];
-
-        for (const move of potentialMoves) {
-            if (this.isValidMove(move, board) && !this.isUnderAttack(move, board)) {
-                moves.push(move);
-            }
-        }
-
-        return moves;
-    }
-
-    // 킹이 공격당하는 위치인지 확인하는 함수 (가장 기본적인 구현 예시)
-    isUnderAttack(position, board) {
-        for (let row = 0; row < board.length; row++) {
-            for (let col = 0; col < board[row].length; col++) {
-                const piece = board[row][col];
-                if (piece && piece.color !== this.color) {
-                    const enemyMoves = piece.getAvailableMoves(board);
-                    if (enemyMoves.some(move => move.x === position.x && move.y === position.y)) {
-                        return true; // 킹이 공격당할 수 있는 위치라면 true 반환
-                    }
+            const movedPawn = board[endRow]?.[endCol];
+            if (
+                movedPawn instanceof Pawn &&
+                movedPawn.color !== this.color &&
+                Math.abs(startRow - endRow) === 2 &&
+                startCol === endCol &&
+                ((this.color === 'white' && this.position.row === 4) ||
+                    (this.color === 'black' && this.position.row === 3)) // 앙파상 위치 조건 추가
+            ) {
+                // 왼쪽 대각선 앙파상
+                if (this.position.row === endRow && this.position.col - 1 === endCol) {
+                    moves.push({
+                        row: endRow + direction,
+                        col: endCol,
+                        type: 'enPassant',
+                        enPassantCapture: { row: endRow, col: endCol },
+                    });
+                }
+                // 오른쪽 대각선 앙파상
+                if (this.position.row === endRow && this.position.col + 1 === endCol) {
+                    moves.push({
+                        row: endRow + direction,
+                        col: endCol,
+                        type: 'enPassant',
+                        enPassantCapture: { row: endRow, col: endCol },
+                    });
                 }
             }
         }
-        return false;
+
+        // 일반 대각선 공격
+        const attackSquares = [leftDiagonal, rightDiagonal];
+        for (const square of attackSquares) {
+            if (this.isValidMove(square, board)) {
+                const pieceAtSquare = board[square.row]?.[square.col];
+                if (pieceAtSquare && pieceAtSquare.color !== this.color) {
+                    moves.push({
+                        ...square,
+                        type: (square.row === 0 || square.row === 7) ? 'promotion' : undefined,
+                    });
+                }
+            }
+        }
+
+        return filterValidMoves(moves, board, this, ChessBoard);
     }
+
 }
 
+
+
+
+/**
+ * Represents a King chess piece.
+ * @extends Piece
+ */
+export class King extends Piece {
+    /**
+     * Gets the available moves for the King, including castling options.
+     * @param {Array} board - The current state of the board.
+     * @param {Object} Chessboard - 체스보드 상태 객체
+     * @returns {Array} - A list of valid move positions.
+     */
+    getAvailableMoves(board, Chessboard) {
+
+        // 기존 킹의 이동 경로 로직
+        let moves = [];
+        const potentialMoves = [
+            { row: this.position.row + 1, col: this.position.col }, // 아래
+            { row: this.position.row - 1, col: this.position.col }, // 위
+            { row: this.position.row, col: this.position.col + 1 }, // 오른쪽
+            { row: this.position.row, col: this.position.col - 1 }, // 왼쪽
+            { row: this.position.row + 1, col: this.position.col + 1 }, // 대각선 아래-오른쪽
+            { row: this.position.row + 1, col: this.position.col - 1 }, // 대각선 아래-왼쪽
+            { row: this.position.row - 1, col: this.position.col + 1 }, // 대각선 위-오른쪽
+            { row: this.position.row - 1, col: this.position.col - 1 }  // 대각선 위-왼쪽
+        ];
+
+        for (const move of potentialMoves) {
+            if (this.isValidMove(move, board)) {
+                // 킹이 이동한 위치가 공격받지 않는 경우만 이동 가능
+                if (!this.isUnderAttack(move, Chessboard)) {
+                    moves.push(move);
+                }
+            }
+        }
+        // 캐슬링 처리
+        if (!this.hasMoved && !this.isUnderAttack(this.position, Chessboard)) {
+            // 킹사이드 캐슬링
+            const rookKingSide = board[this.position.row]?.[7];
+            if (rookKingSide instanceof Rook && !rookKingSide.hasMoved) {
+                if (
+                    !board[this.position.row][5] &&
+                    !board[this.position.row][6] &&
+                    !this.isUnderAttack({ row: this.position.row, col: 5 }, Chessboard) &&
+                    !this.isUnderAttack({ row: this.position.row, col: 6 }, Chessboard)
+                ) {
+                    moves.push({
+                        row: this.position.row,
+                        col: 6,
+                        type: 'castling', // 캐슬링 신호 추가
+                        rookStart: { row: this.position.row, col: 7 },
+                        rookEnd: { row: this.position.row, col: 5 },
+                    });
+                }
+            }
+
+            // 퀸사이드 캐슬링
+            const rookQueenSide = board[this.position.row]?.[0];
+            if (rookQueenSide instanceof Rook && !rookQueenSide.hasMoved) {
+                if (
+                    !board[this.position.row][1] &&
+                    !board[this.position.row][2] &&
+                    !board[this.position.row][3] &&
+                    !this.isUnderAttack({ row: this.position.row, col: 2 }, Chessboard) &&
+                    !this.isUnderAttack({ row: this.position.row, col: 3 }, Chessboard)
+                ) {
+                    moves.push({
+                        row: this.position.row,
+                        col: 2,
+                        type: 'castling', // 캐슬링 신호 추가
+                        rookStart: { row: this.position.row, col: 0 },
+                        rookEnd: { row: this.position.row, col: 3 },
+                    });
+                }
+            }
+        }
+
+        return filterValidMoves(moves, board, this, ChessBoard);
+
+    }
+
+    /**
+     * Checks if the given position is under attack by enemy pieces.
+     * @param {Object} position - The position to check.
+     * @param {Object} Chessboard - 체스보드 상태 객체
+     * @returns {boolean} - True if the position is under attack.
+     */
+    isUnderAttack(position, Chessboard) {
+        const { board } = Chessboard;
+
+        // 1. 직선 및 대각선 방향에서 공격 확인
+        const directions = [
+            { row: 1, col: 0 }, { row: -1, col: 0 }, // 상하
+            { row: 0, col: 1 }, { row: 0, col: -1 }, // 좌우
+            { row: 1, col: 1 }, { row: 1, col: -1 }, // 대각선 아래
+            { row: -1, col: 1 }, { row: -1, col: -1 } // 대각선 위
+        ];
+
+        for (const direction of directions) {
+            let row = position.row;
+            let col = position.col;
+
+            while (true) {
+                row += direction.row;
+                col += direction.col;
+                if (row < 0 || row > 7 || col < 0 || col > 7) break; // 경계 확인
+
+                const piece = board[row]?.[col];
+                if (!piece) continue; // 빈 칸이면 다음 칸 확인
+                if (piece.color === this.color) break; // 같은 색 기물이면 종료
+
+                // 공격 가능 기물 체크
+                if (
+                    (piece instanceof Queen) ||
+                    (piece instanceof Rook && (direction.row === 0 || direction.col === 0)) ||
+                    (piece instanceof Bishop && direction.row !== 0 && direction.col !== 0)
+                ) {
+                    return true;
+                }
+                break;
+            }
+        }
+
+        // 2. 나이트 공격 확인
+        const knightMoves = [
+            { row: 2, col: 1 }, { row: 2, col: -1 },
+            { row: -2, col: 1 }, { row: -2, col: -1 },
+            { row: 1, col: 2 }, { row: 1, col: -2 },
+            { row: -1, col: 2 }, { row: -1, col: -2 }
+        ];
+
+        for (const move of knightMoves) {
+            const newRow = position.row + move.row;
+            const newCol = position.col + move.col;
+            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+            const piece = board[newRow]?.[newCol];
+            if (piece instanceof Knight && piece.color !== this.color) {
+                return true;
+            }
+        }
+
+        // 3. 폰 공격 확인
+        const pawnAttackDirections = this.color === 'white'
+            ? [{ row: 1, col: 1 }, { row: 1, col: -1 }]
+            : [{ row: -1, col: 1 }, { row: -1, col: -1 }];
+
+        for (const direction of pawnAttackDirections) {
+            const newRow = position.row + direction.row;
+            const newCol = position.col + direction.col;
+            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+            const piece = board[newRow]?.[newCol];
+            if (piece instanceof Pawn && piece.color !== this.color) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+}
+
+/**
+ * 킹이 체크를 피하기 위해 이동 가능 칸을 필터링
+ * @param {Array} moves - 원래 이동 가능 경로
+ * @param {Array} board - 현재 체스판 상태 배열
+ * @param {Piece} piece - 이동하려는 기물 객체
+ * @param {Object} chessboardState - 체스보드 상태 (킹 위치, 턴, 이동 기록 등)
+ * @returns {Array} - 체크를 피할 수 있는 유효한 이동 경로
+ */
+function filterValidMoves(moves, board, piece, chessboardState) {
+    const safeMoves = [];
+
+    for (const move of moves) {
+        // 체스판 복제
+        const simulatedBoard = board.map(row => [...row]);
+
+        // 기물을 임시로 이동
+        const originalPosition = { ...piece.position };
+        simulatedBoard[originalPosition.row][originalPosition.col] = null;
+        simulatedBoard[move.row][move.col] = piece;
+
+        // 기물의 임시 위치 업데이트
+        piece.position = { row: move.row, col: move.col };
+
+        // 킹의 위치 계산 (킹이 직접 이동하는 경우와 아닌 경우 처리)
+        const kingPosition = piece instanceof King
+            ? piece.position
+            : findKingPosition(simulatedBoard, piece.color);
+
+        // 킹이 체크 상태인지 확인
+        const king = new King('King', kingPosition, piece.color, null); // 임시 King 객체 생성
+        const isInCheck = king.isUnderAttack(kingPosition, { ...chessboardState, board: simulatedBoard });
+
+        if (!isInCheck) {
+            safeMoves.push(move); // 킹이 체크되지 않는 경우에만 유효 이동 경로로 추가
+        }
+
+        // 기물의 원래 위치 복원
+        piece.position = originalPosition;
+    }
+
+    return safeMoves;
+}
+
+/**
+ * 체스판에서 특정 색상의 킹 위치를 찾는 함수
+ * @param {Array<Array<Piece|null>>} board - 현재 체스판 배열
+ * @param {string} color - 찾으려는 킹의 색상 ('white' 또는 'black')
+ * @returns {Object|null} - 킹의 위치 객체 { row, col } 또는 null (킹이 없는 경우)
+ */
+function findKingPosition(board, color) {
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board[row].length; col++) {
+            const piece = board[row][col];
+            if (piece instanceof King && piece.color === color) {
+                return { row, col };
+            }
+        }
+    }
+    return null; // 킹이 없는 경우
+}
 
